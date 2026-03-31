@@ -43,17 +43,22 @@ export default function Login() {
     if (!existingProfile) {
       // First login after email confirmation — create profile from user_metadata
       const meta = user.user_metadata || {};
-      const role = meta.role || 'student';
+      const role = (meta.role === 'teacher' || meta.role === 'student') ? meta.role : 'student';
       const full_name = meta.full_name || '';
-      const module = meta.module || '';
 
-      await supabase.from('profiles').insert({
+      const { error: insertError } = await supabase.from('profiles').insert({
         id: user.id,
         email: user.email,
         name: full_name,
         role: role,
-        module: module,
       });
+
+      if (insertError) {
+        // Show the real error so we can diagnose it
+        setError(`Profile creation failed: ${insertError.message}`);
+        setLoading(false);
+        return;
+      }
     }
 
     navigate('/dashboard');

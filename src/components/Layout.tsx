@@ -1,11 +1,46 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { BookOpen, Home, Users, LogIn, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { BookOpen, Home, Users, LogIn, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { cn } from '../lib/utils';
+import { supabase } from '../lib/supabase';
+import type { User } from '@supabase/supabase-js';
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const meta = session.user.user_metadata;
+        setUserName(meta?.full_name || session.user.email?.split('@')[0] || null);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const meta = session.user.user_metadata;
+        setUserName(meta?.full_name || session.user.email?.split('@')[0] || null);
+      } else {
+        setUserName(null);
+      }
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+    setIsMobileMenuOpen(false);
+  };
 
   const navItems = [
     { name: 'Home', path: '/', icon: Home },
@@ -34,14 +69,16 @@ export default function Layout() {
             <nav className="hidden md:flex flex-1 justify-center space-x-8">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== '/' && location.pathname.startsWith(item.path));
                 return (
                   <Link
                     key={item.name}
                     to={item.path}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors hover:text-primary",
-                      isActive ? "text-primary border-b-2 border-primary" : "text-slate-600"
+                      'flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors hover:text-primary',
+                      isActive ? 'text-primary border-b-2 border-primary' : 'text-slate-600'
                     )}
                   >
                     <Icon className="w-4 h-4" />
@@ -51,14 +88,37 @@ export default function Layout() {
               })}
             </nav>
 
-            <div className="hidden md:flex items-center space-x-4">
-               <Link
+            {/* Desktop Auth Buttons */}
+            <div className="hidden md:flex items-center space-x-3">
+              {user ? (
+                <>
+                  <span className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg truncate max-w-[140px]">
+                    👋 {userName}
+                  </span>
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-primary transition-colors"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
                   to="/login"
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
                   Sign In
-              </Link>
+                </Link>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -79,15 +139,19 @@ export default function Layout() {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== '/' && location.pathname.startsWith(item.path));
                 return (
                   <Link
                     key={item.name}
                     to={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium",
-                      isActive ? "bg-primary/10 text-primary" : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                      'flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium',
+                      isActive
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-primary'
                     )}
                   >
                     <Icon className="w-5 h-5" />
@@ -95,14 +159,40 @@ export default function Layout() {
                   </Link>
                 );
               })}
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-primary mt-4 border-t border-gray-100 pt-4"
-              >
-                <LogIn className="w-5 h-5" />
-                Sign In
-              </Link>
+
+              <div className="border-t border-gray-100 pt-4 mt-2 space-y-2">
+                {user ? (
+                  <>
+                    <div className="px-3 py-2 text-sm font-semibold text-slate-700">
+                      👋 {userName}
+                    </div>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-primary"
+                    >
+                      <LayoutDashboard className="w-5 h-5" />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-rose-600 hover:bg-rose-50"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-primary"
+                  >
+                    <LogIn className="w-5 h-5" />
+                    Sign In
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}

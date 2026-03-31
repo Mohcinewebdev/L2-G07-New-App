@@ -15,17 +15,48 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
-      setError(error.message);
+    if (signInError) {
+      setError(signInError.message);
       setLoading(false);
-    } else {
-      navigate('/dashboard'); // Or home page
+      return;
     }
+
+    const user = authData.user;
+    if (!user) {
+      setError('Login failed. Please try again.');
+      setLoading(false);
+      return;
+    }
+
+    // Check if the user already has a profile in the public.profiles table
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id, role')
+      .eq('id', user.id)
+      .single();
+
+    if (!existingProfile) {
+      // First login after email confirmation — create profile from user_metadata
+      const meta = user.user_metadata || {};
+      const role = meta.role || 'student';
+      const full_name = meta.full_name || '';
+      const module = meta.module || '';
+
+      await supabase.from('profiles').insert({
+        id: user.id,
+        email: user.email,
+        name: full_name,
+        role: role,
+        module: module,
+      });
+    }
+
+    navigate('/dashboard');
   };
 
   return (
@@ -37,7 +68,7 @@ export default function Login() {
               L2
             </div>
           </div>
-          
+
           <h2 className="text-3xl font-bold text-center text-slate-800 mb-2">Welcome Back</h2>
           <p className="text-center text-slate-500 mb-8 font-medium">
             Sign in to access your dashboard
@@ -49,7 +80,7 @@ export default function Login() {
                 {error}
               </div>
             )}
-            
+
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 block" htmlFor="email">
                 Email Address

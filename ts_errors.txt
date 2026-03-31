@@ -1,0 +1,7 @@
+﻿src/components/Layout.tsx(16,9): error TS6133: 'adminItems' is declared but its value is never read.
+src/lib/supabase.ts(3,33): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/lib/supabase.ts(4,37): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/pages/Dashboard.tsx(7,10): error TS6133: 'session' is declared but its value is never read.
+src/pages/Dashboard.tsx(29,19): error TS6133: 'error' is declared but its value is never read.
+vite.config.ts(3,25): error TS2307: Cannot find module '@tailwindcss/vite' or its corresponding type declarations.
+vite.config.ts(4,25): error TS2307: Cannot find module 'vite-plugin-pwa' or its corresponding type declarations.

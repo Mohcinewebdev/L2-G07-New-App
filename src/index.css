@@ -1,0 +1,6 @@
+@import "tailwindcss";
+ @theme
+  { --color-primary: #3b82f6; --color-primary-dark: #2563eb; --color-secondary: #f3f4f6; --font-sans: 'Inter', system-ui, sans-serif; } 
+  @layer base { body { @apply bg-slate-50 text-slate-900 leading-relaxed font-sans overflow-x-hidden; } } 
+  .glass-panel { @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl; } .card-hover 
+  { @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10};

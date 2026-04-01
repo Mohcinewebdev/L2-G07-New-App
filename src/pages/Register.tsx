@@ -58,13 +58,13 @@ export default function Register() {
 
     if (authData.user) {
       // Use upsert so it works even if a partial row already exists
-      const { error: profileError } = await supabase.from('profiles').upsert({
-        id: authData.user.id,
-        email: authData.user.email,
-        name: name,
-        role: role,
-        module: selectedModule,
-      });
+       const { error: profileError } = await supabase.from('profiles').upsert({
+         id: authData.user.id,
+         email: authData.user.email,
+         name: name,
+         role: role,
+         module: role === 'teacher' ? selectedModule : null,
+       });
 
       if (profileError) {
         console.error('Failed to create public profile:', profileError);

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Mail, GraduationCap } from 'lucide-react';
+import { Mail, GraduationCap, BookOpen, User } from 'lucide-react';
 
 interface Teacher {
   id: string;
   name: string;
   email: string;
+  module: string | null;
 }
 
 export default function Teachers() {
@@ -16,7 +17,7 @@ export default function Teachers() {
     async function getTeachers() {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, name, email')
+        .select('id, name, email, module')
         .eq('role', 'teacher')
         .order('name');
         
@@ -37,8 +38,8 @@ export default function Teachers() {
 
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl bg-slate-100 animate-pulse"></div>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-56 rounded-3xl bg-slate-100 animate-pulse"></div>
           ))}
         </div>
       ) : (
@@ -46,34 +47,60 @@ export default function Teachers() {
           {teachers.map((teacher) => (
             <div 
               key={teacher.id}
-              className="card-hover glass-panel rounded-2xl p-6 flex flex-col relative overflow-hidden bg-white/50"
+              className="group bg-white rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col"
             >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full 'bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white text-2xl font-bold shadow-md">
-                  {teacher.name ? teacher.name.charAt(0).toUpperCase() : 'T'}
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">{teacher.name || 'Unnamed Teacher'}</h3>
-                  <p className="text-sm font-medium text-primary flex items-center gap-1">
-                    <GraduationCap className="w-4 h-4" /> Faculty
-                  </p>
-                </div>
+              {/* Card Header Decoration */}
+              <div className="h-20 bg-gradient-to-r from-indigo-500 to-purple-600 relative">
+                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
               </div>
 
-              <div className="mt-auto">
-                <a 
-                  href={`mailto:${teacher.email}`}
-                  className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors bg-slate-50 p-3 rounded-xl border border-slate-100"
-                >
-                  <Mail className="w-4 h-4" />
-                  {teacher.email}
-                </a>
+              {/* Avatar section */}
+              <div className="px-6 pb-6 flex flex-col flex-1 -mt-10">
+                <div className="w-20 h-20 rounded-2xl bg-white p-1 shadow-lg mb-4">
+                  <div className="w-full h-full rounded-xl bg-gradient-to-br from-indigo-50 to-slate-50 flex items-center justify-center text-indigo-600 text-2xl font-bold border border-slate-100">
+                    {teacher.name ? teacher.name.charAt(0).toUpperCase() : <User className="w-8 h-8 opacity-40" />}
+                  </div>
+                </div>
+
+                {/* Info section */}
+                <div className="flex-1">
+                  <h3 className="text-xl font-extrabold text-slate-800 leading-tight mb-1 group-hover:text-indigo-600 transition-colors">
+                    {teacher.name || 'Unnamed Teacher'}
+                  </h3>
+                  
+                  <div className="flex items-center gap-1.5 text-indigo-600 mb-4">
+                    <GraduationCap className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Faculty</span>
+                  </div>
+
+                  {teacher.module && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-slate-600 mb-6">
+                      <BookOpen className="w-4 h-4 text-indigo-500" />
+                      <span className="text-sm font-medium">{teacher.module}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Contact section */}
+                <div className="pt-4 border-t border-slate-50">
+                  <a 
+                    href={`mailto:${teacher.email}`}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-indigo-600 transition-all duration-300 shadow-md hover:shadow-indigo-500/20"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Contact Now
+                  </a>
+                  <p className="mt-2 text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest">{teacher.email}</p>
+                </div>
               </div>
             </div>
           ))}
-          {teachers.length === 0 && !loading && (
-            <div className="col-span-full py-12 text-center text-slate-500 glass-panel rounded-2xl">
-              No teachers registered yet.
+          
+          {teachers.length === 0 && (
+            <div className="col-span-full py-20 text-center rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200">
+              <User className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500 font-bold text-lg">No teachers registered yet.</p>
+              <p className="text-slate-400 text-sm mt-1">New faculty members will appear here once they join.</p>
             </div>
           )}
         </div>

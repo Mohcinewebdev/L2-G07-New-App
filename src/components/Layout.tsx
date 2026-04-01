@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, Home, Users, LogIn, Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
+import { BookOpen, Home, Users, LogIn, Menu, X, LayoutDashboard, LogOut, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
@@ -100,18 +100,27 @@ export default function Layout() {
                 // Logged-in: show user's name + dashboard link + sign out
                 <>
                   <Link
-                    to="/dashboard"
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                    to="/profile"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200"
                   >
-                    <LayoutDashboard className="w-4 h-4 text-primary" />
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-primary group transition-all">
+                      <User className="w-4 h-4 group-hover:scale-110" />
+                    </div>
                     <span className="max-w-[120px] truncate">{userName}</span>
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="p-2 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 transition-colors"
+                    title="Dashboard"
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                    className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                    title="Sign Out"
                   >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
+                    <LogOut className="w-5 h-5" />
                   </button>
                 </>
               ) : (
@@ -169,16 +178,24 @@ export default function Layout() {
                 {userName ? (
                   <>
                     <Link
+                      to="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-3 rounded-2xl text-base font-bold text-slate-700 bg-slate-50"
+                    >
+                      <User className="w-5 h-5 text-primary" />
+                      Profile Settings
+                    </Link>
+                    <Link
                       to="/dashboard"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-semibold text-primary"
+                      className="flex items-center gap-3 px-3 py-3 rounded-2xl text-base font-bold text-primary bg-primary/5"
                     >
                       <LayoutDashboard className="w-5 h-5" />
-                      {userName} — Dashboard
+                      Dashboard
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-rose-600 hover:bg-rose-50"
+                      className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-base font-bold text-rose-600 hover:bg-rose-50"
                     >
                       <LogOut className="w-5 h-5" />
                       Sign Out

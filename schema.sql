@@ -7,6 +7,7 @@ create table profiles (
   email text unique not null,
   role text check(role in ('teacher', 'student')) default 'student',
   name text,
+  module text, -- The module the teacher teaches
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -57,12 +58,14 @@ insert into courses (name, description, theme_color) values
 -- 3. Lessons Table
 create table lessons (
   id uuid default uuid_generate_v4() primary key,
-  course_id uuid references courses(id) on delete cascade not null,
+  course_id uuid references courses(id) on delete cascade,
   teacher_id uuid references profiles(id) on delete set null,
+  module text,
   title text not null,
   description text,
   pdf_url text,
   youtube_url text, -- For iframe videos
+  semester integer default 1 check (semester in (1, 2)),
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -84,11 +87,13 @@ create policy "Teachers can delete lessons." on lessons for delete using (
 -- 4. Assignments Table
 create table assignments (
   id uuid default uuid_generate_v4() primary key,
-  course_id uuid references courses(id) on delete cascade not null,
+  course_id uuid references courses(id) on delete cascade,
   teacher_id uuid references profiles(id) on delete set null,
+  module text,
   title text not null,
   description text,
   deadline timestamp with time zone,
+  semester integer default 1 check (semester in (1, 2)),
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

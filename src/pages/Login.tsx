@@ -15,7 +15,7 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
-    const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -26,38 +26,26 @@ export default function Login() {
       return;
     }
 
-    const user = authData.user;
-    if (!user) {
-      setError('Login failed. Please try again.');
-      setLoading(false);
-      return;
-    }
+    // FIX: After login, ensure the profile row exists.
+    // If the email-confirmation redirect happened and the profile insert failed
+    // (due to RLS running before session was established), we create it here.
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .single();
 
-    // Check if the user already has a profile in the public.profiles table
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('id, role')
-      .eq('id', user.id)
-      .single();
-
-    if (!existingProfile) {
-      // First login after email confirmation — create profile from user_metadata
-      const meta = user.user_metadata || {};
-      const role = (meta.role === 'teacher' || meta.role === 'student') ? meta.role : 'student';
-      const full_name = meta.full_name || '';
-
-      const { error: insertError } = await supabase.from('profiles').insert({
-        id: user.id,
-        email: user.email,
-        name: full_name,
-        role: role,
-      });
-
-      if (insertError) {
-        // Show the real error so we can diagnose it
-        setError(`Profile creation failed: ${insertError.message}`);
-        setLoading(false);
-        return;
+      if (!profile) {
+        // Profile missing — create it now from user_metadata
+        const meta = data.user.user_metadata ?? {};
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          email: data.user.email,
+          name: meta.full_name ?? '',
+          role: meta.role ?? 'student',
+          module: meta.module ?? '',
+        });
       }
     }
 

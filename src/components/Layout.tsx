@@ -1,33 +1,39 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, Home, Users, LogIn, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
+import { BookOpen, Home, Users, LogIn, Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
-import type { User } from '@supabase/supabase-js';
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Track auth state to show user name next to sign-in button
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        const meta = session.user.user_metadata;
-        setUserName(meta?.full_name || session.user.email?.split('@')[0] || null);
+        const name =
+          session.user.user_metadata?.full_name ||
+          session.user.email?.split('@')[0] ||
+          'User';
+        setUserName(name);
+      } else {
+        setUserName(null);
       }
-    });
+    };
 
-    // Listen for auth changes
+    getUser();
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
       if (session?.user) {
-        const meta = session.user.user_metadata;
-        setUserName(meta?.full_name || session.user.email?.split('@')[0] || null);
+        const name =
+          session.user.user_metadata?.full_name ||
+          session.user.email?.split('@')[0] ||
+          'User';
+        setUserName(name);
       } else {
         setUserName(null);
       }
@@ -38,6 +44,7 @@ export default function Layout() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    setUserName(null);
     navigate('/login');
     setIsMobileMenuOpen(false);
   };
@@ -54,14 +61,13 @@ export default function Layout() {
       <header className="sticky top-0 z-50 glass-panel border-b border-gray-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
+            {/* Logo */}
             <div className="flex items-center">
               <Link to="/" className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-lg">
                   L2
                 </div>
-                <span className="font-bold text-xl tracking-tight text-slate-800">
-                  L2 | G07
-                </span>
+                <span className="font-bold text-xl tracking-tight text-slate-800">L2 | G07</span>
               </Link>
             </div>
 
@@ -88,29 +94,28 @@ export default function Layout() {
               })}
             </nav>
 
-            {/* Desktop Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-3">
-              {user ? (
+            {/* Desktop Auth section */}
+            <div className="hidden md:flex items-center gap-3">
+              {userName ? (
+                // Logged-in: show user's name + dashboard link + sign out
                 <>
-                  <span className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg truncate max-w-[140px]">
-                    👋 {userName}
-                  </span>
                   <Link
                     to="/dashboard"
-                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-primary transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
                   >
-                    <LayoutDashboard className="w-4 h-4" />
-                    Dashboard
+                    <LayoutDashboard className="w-4 h-4 text-primary" />
+                    <span className="max-w-[120px] truncate">{userName}</span>
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
                   </button>
                 </>
               ) : (
+                // Not logged in: show Sign In button
                 <Link
                   to="/login"
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
@@ -160,23 +165,20 @@ export default function Layout() {
                 );
               })}
 
-              <div className="border-t border-gray-100 pt-4 mt-2 space-y-2">
-                {user ? (
+              <div className="border-t border-gray-100 mt-2 pt-2 space-y-1">
+                {userName ? (
                   <>
-                    <div className="px-3 py-2 text-sm font-semibold text-slate-700">
-                      👋 {userName}
-                    </div>
                     <Link
                       to="/dashboard"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-primary"
+                      className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-semibold text-primary"
                     >
                       <LayoutDashboard className="w-5 h-5" />
-                      Dashboard
+                      {userName} — Dashboard
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-rose-600 hover:bg-rose-50"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-rose-600 hover:bg-rose-50"
                     >
                       <LogOut className="w-5 h-5" />
                       Sign Out

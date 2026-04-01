@@ -6,20 +6,15 @@ import {
   X, Loader2, CheckCircle, Calendar, Edit2, Save, AlertCircle, BookOpen, GraduationCap
 } from 'lucide-react';
 
-const MODULES = [
-  'Phonetics & Linguistics',
-  'Reading & Text Analysis',
-  'Written Expression',
-  'Grammar',
-  'Study Skills',
-  'Literature',
-  'Civilization',
-];
+interface Course {
+  id: string;
+  name: string;
+}
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface LessonForm {
   title: string;
   description: string;
+  course_id: string;
   module: string;
   semester: number;
   file: File | null;
@@ -28,6 +23,7 @@ interface LessonForm {
 interface AssignmentForm {
   title: string;
   description: string;
+  course_id: string;
   module: string;
   semester: number;
   deadline: string;
@@ -37,10 +33,11 @@ type Modal = 'none' | 'lesson' | 'assignment';
 
 // ─── Component Helpers ────────────────────────────────────────────────────────
 function SelectInput({
-  value, onChange, disabled,
+  value, onChange, courses, disabled,
 }: {
   value: string;
-  onChange: (v: string) => void;
+  onChange: (v: { id: string, name: string }) => void;
+  courses: Course[];
   disabled?: boolean;
 }) {
   return (
@@ -48,13 +45,16 @@ function SelectInput({
       <select
         required
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          const c = courses.find(x => x.id === e.target.value);
+          if (c) onChange({ id: c.id, name: c.name });
+        }}
         disabled={disabled}
         className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 outline-none font-medium text-slate-700 bg-white appearance-none cursor-pointer pr-10 disabled:opacity-60"
       >
         <option value="">— Select a module —</option>
-        {MODULES.map((m) => (
-          <option key={m} value={m}>{m}</option>
+        {courses.map((c) => (
+          <option key={c.id} value={c.id}>{c.name}</option>
         ))}
       </select>
       <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -113,6 +113,7 @@ export default function Dashboard() {
   const [userName, setUserName] = useState('');
   const [teacherModule, setTeacherModule] = useState('');
   const [userId, setUserId] = useState('');
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Edit name
@@ -124,14 +125,14 @@ export default function Dashboard() {
   const [activeModal, setActiveModal] = useState<Modal>('none');
 
   // Lesson form
-  const [lessonForm, setLessonForm] = useState<LessonForm>({ title: '', description: '', module: '', semester: 1, file: null });
+  const [lessonForm, setLessonForm] = useState<LessonForm>({ title: '', description: '', course_id: '', module: '', semester: 1, file: null });
   const [lessonLoading, setLessonLoading] = useState(false);
   const [lessonSuccess, setLessonSuccess] = useState(false);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Assignment form
-  const [asgForm, setAsgForm] = useState<AssignmentForm>({ title: '', description: '', module: '', semester: 1, deadline: '' });
+  const [asgForm, setAsgForm] = useState<AssignmentForm>({ title: '', description: '', course_id: '', module: '', semester: 1, deadline: '' });
   const [asgLoading, setAsgLoading] = useState(false);
   const [asgSuccess, setAsgSuccess] = useState(false);
   const [asgError, setAsgError] = useState<string | null>(null);
@@ -147,6 +148,10 @@ export default function Dashboard() {
 
       const uid = session.user.id;
       setUserId(uid);
+
+      // Fetch dynamic courses
+      const { data: dbCourses } = await supabase.from('courses').select('id, name');
+      if (!ignore && dbCourses) setCourses(dbCourses);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -166,10 +171,13 @@ export default function Dashboard() {
           setTeacherModule(data.module ?? '');
         }
         
-        // Pre-fill module in forms
-        if (data?.module) {
-          setLessonForm(f => ({ ...f, module: data.module }));
-          setAsgForm(f => ({ ...f, module: data.module }));
+        // Auto-match module from profile to dynamic courses
+        if (dbCourses) {
+          const matched = dbCourses.find(c => c.name === (data?.module || session.user.user_metadata?.module));
+          if (matched) {
+            setLessonForm(f => ({ ...f, module: matched.name, course_id: matched.id }));
+            setAsgForm(f => ({ ...f, module: matched.name, course_id: matched.id }));
+          }
         }
         
         setLoading(false);
@@ -235,6 +243,7 @@ export default function Dashboard() {
       title: lessonForm.title,
       description: lessonForm.description || null,
       pdf_url: pdfUrl,
+      course_id: lessonForm.course_id || null, // FIX: save course_id
       module: lessonForm.module,
       semester: lessonForm.semester,
       teacher_id: userId,
@@ -247,7 +256,7 @@ export default function Dashboard() {
       setTimeout(() => {
         setLessonSuccess(false);
         setActiveModal('none');
-        setLessonForm({ title: '', description: '', module: teacherModule, semester: 1, file: null });
+        setLessonForm({ title: '', description: '', course_id: '', module: teacherModule, semester: 1, file: null });
       }, 2000);
     }
     setLessonLoading(false);
@@ -262,6 +271,7 @@ export default function Dashboard() {
       title: asgForm.title,
       description: asgForm.description || null,
       deadline: asgForm.deadline || null,
+      course_id: asgForm.course_id || null, // FIX: save course_id
       module: asgForm.module,
       semester: asgForm.semester,
       teacher_id: userId,
@@ -274,7 +284,7 @@ export default function Dashboard() {
       setTimeout(() => {
         setAsgSuccess(false);
         setActiveModal('none');
-        setAsgForm({ title: '', description: '', module: teacherModule, semester: 1, deadline: '' });
+        setAsgForm({ title: '', description: '', course_id: '', module: teacherModule, semester: 1, deadline: '' });
       }, 2000);
     }
     setAsgLoading(false);
@@ -439,8 +449,9 @@ export default function Dashboard() {
                     <div className="space-y-2">
                        <label className="text-sm font-bold text-slate-700 ml-1">Module</label>
                        <SelectInput 
-                         value={lessonForm.module} 
-                         onChange={(v) => setLessonForm({...lessonForm, module: v})}
+                         value={lessonForm.course_id} 
+                         courses={courses}
+                         onChange={(c) => setLessonForm({...lessonForm, module: c.name, course_id: c.id})}
                        />
                     </div>
 
@@ -525,8 +536,9 @@ export default function Dashboard() {
                     <div className="space-y-2">
                        <label className="text-sm font-bold text-slate-700 ml-1">Module</label>
                        <SelectInput 
-                         value={asgForm.module} 
-                         onChange={(v) => setAsgForm({...asgForm, module: v})}
+                         value={asgForm.course_id} 
+                         courses={courses}
+                         onChange={(c) => setAsgForm({...asgForm, module: c.name, course_id: c.id})}
                        />
                     </div>
 

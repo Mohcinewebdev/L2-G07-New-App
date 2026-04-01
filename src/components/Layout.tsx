@@ -226,7 +226,7 @@ export default function Layout() {
       <footer className="glass-panel border-t border-gray-200 mt-auto">
         <div className="container mx-auto px-4 py-6">
           <p className="text-center text-sm text-slate-500">
-            &copy; {new Date().getFullYear()} L2 | G07 English Department. All rights reserved.
+            &copy; {new Date().getFullYear()} Developed And Designed By MOHCENE ZIADI | L2 | G07 English Department. All rights reserved.
           </p>
         </div>
       </footer>

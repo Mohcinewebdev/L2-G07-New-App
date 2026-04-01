@@ -36,15 +36,18 @@ export default function CourseDetail() {
     async function getCourseDetails() {
       if (!id) return;
       
-      const [courseRes, lessonsRes, assignmentsRes] = await Promise.all([
-        supabase.from('courses').select('*').eq('id', id).single(),
-        supabase.from('lessons').select('*').eq('course_id', id).order('created_at', { ascending: false }),
-        supabase.from('assignments').select('*').eq('course_id', id).order('deadline', { ascending: true }),
-      ]);
+      const { data: courseData } = await supabase.from('courses').select('*').eq('id', id).single();
 
-      if (courseRes.data) setCourse(courseRes.data);
-      if (lessonsRes.data) setLessons(lessonsRes.data);
-      if (assignmentsRes.data) setAssignments(assignmentsRes.data);
+      if (courseData) {
+        setCourse(courseData);
+        const cName = courseData.name;
+        const [lRes, aRes] = await Promise.all([
+          supabase.from('lessons').select('*').or(`course_id.eq.${id},module.eq."${cName}"`).order('created_at', { ascending: false }),
+          supabase.from('assignments').select('*').or(`course_id.eq.${id},module.eq."${cName}"`).order('deadline', { ascending: true }),
+        ]);
+        setLessons(lRes.data || []);
+        setAssignments(aRes.data || []);
+      }
       
       setLoading(false);
     }

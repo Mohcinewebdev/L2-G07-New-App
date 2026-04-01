@@ -21,7 +21,9 @@ export default function Teachers() {
         .eq('role', 'teacher')
         .order('name');
         
-      if (!error && data) {
+      if (error) {
+        console.error('Error fetching teachers:', error.message);
+      } else if (data) {
         setTeachers(data);
       }
       setLoading(false);

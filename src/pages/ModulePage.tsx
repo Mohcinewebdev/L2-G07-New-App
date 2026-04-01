@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
   ArrowLeft, FileText, Calendar, Clock, BookOpen,
-  GraduationCap, AlertCircle, FileDown
+  GraduationCap, AlertCircle, FileDown, Loader2
 } from 'lucide-react';
 
 // ─── Slug → module config ─────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ interface Lesson {
   title: string;
   description: string | null;
   pdf_url: string | null;
-  semester: number;
+  semester: string | number; // Support both
   created_at: string;
 }
 
@@ -84,7 +84,7 @@ interface Assignment {
 
 function PdfCard({ lesson, accent }: { lesson: Lesson; accent: string }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-5 flex gap-4 items-start">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-5 flex gap-4 items-start animate-in fade-in slide-in-from-left-2 transition-all">
       <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
         <FileText className="w-6 h-6" />
       </div>
@@ -94,7 +94,7 @@ function PdfCard({ lesson, accent }: { lesson: Lesson; accent: string }) {
           <p className="text-sm text-slate-500 mt-1 line-clamp-2">{lesson.description}</p>
         )}
         <p className="text-xs text-slate-400 mt-2">
-          Added {new Date(lesson.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+          Added {new Date(lesson.created_at).toLocaleDateString()}
         </p>
       </div>
       {lesson.pdf_url && (
@@ -105,18 +105,18 @@ function PdfCard({ lesson, accent }: { lesson: Lesson; accent: string }) {
           className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-current ${accent} hover:bg-slate-50 transition-colors shrink-0`}
         >
           <FileDown className="w-4 h-4" />
-          Open
+          View PDF
         </a>
       )}
     </div>
   );
 }
 
-function EmptySection({ label }: { label: string }) {
+function EmptySection({ label, icon: Icon }: { label: string; icon: any }) {
   return (
-    <div className="py-10 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-      <BookOpen className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-      <p className="text-sm text-slate-400 font-medium">No {label} yet.</p>
+    <div className="py-12 rounded-2xl border-2 border-dashed border-slate-200 text-center bg-slate-50/50">
+      <Icon className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+      <p className="text-sm text-slate-400 font-bold uppercase tracking-wider">No {label} available</p>
     </div>
   );
 }
@@ -134,37 +134,63 @@ export default function ModulePage() {
     if (!config) { setLoading(false); return; }
 
     async function load() {
-      // Fetch lessons for this module, split by semester
-      const { data: lessons } = await supabase
+      if (!config) return;
+      setLoading(true);
+      
+      console.log(`[ModulePage] loading module: ${config.name}`);
+
+      // 1. Fetch ALL lessons to debug RLS vs Filter
+      const { data: allLessons, error: lError } = await supabase
         .from('lessons')
-        .select('id, title, description, pdf_url, semester, created_at')
-        .eq('module', config!.name)
-        .order('created_at', { ascending: true });
+        .select('*');
 
-      // Fetch assignments for this module
-      const { data: asgn } = await supabase
-        .from('assignments')
-        .select('id, title, description, deadline, created_at')
-        .eq('module', config!.name)
-        .order('created_at', { ascending: false });
-
-      if (lessons) {
-        setSem1(lessons.filter((l) => l.semester === 1));
-        setSem2(lessons.filter((l) => l.semester === 2));
+      if (lError) {
+        console.error(`[Lessons Error]:`, lError.message);
+      } else if (allLessons) {
+        console.log(`[Lessons Total in DB]:`, allLessons.length);
+        
+        // Match by module name (Case Insensitive & Trimmed)
+        const matched = allLessons.filter(l => 
+          l.module?.toString().trim().toLowerCase() === config.name.toLowerCase() ||
+          l.course_id === slug // or some other ID match
+        );
+        
+        setSem1(matched.filter(l => !l.semester || Number(l.semester) === 1));
+        setSem2(matched.filter(l => Number(l.semester) === 2));
+        
+        // Update diagnostic info with total unfiltered count
+        const debugDiv = document.getElementById('debug-info');
+        if (debugDiv) {
+           debugDiv.innerHTML += `<p>Total Lessons in Table: ${allLessons.length}</p>`;
+        }
       }
-      if (asgn) setAssignments(asgn);
+
+      // 2. Fetch Assignments
+      const { data: allAsgn, error: aError } = await supabase
+        .from('assignments')
+        .select('*');
+
+      if (aError) {
+        console.error(`[Assignments Error]:`, aError.message);
+      } else if (allAsgn) {
+        const matchedAsgn = allAsgn.filter(a => 
+          a.module?.toString().trim().toLowerCase() === config.name.toLowerCase()
+        );
+        setAssignments(matchedAsgn);
+      }
+      
       setLoading(false);
     }
 
     load();
-  }, [slug, config]);
+  }, [slug]);
 
   if (!config) {
     return (
       <div className="text-center py-24">
         <AlertCircle className="w-12 h-12 text-slate-300 mx-auto mb-3" />
         <p className="text-slate-500 font-medium">Module not found.</p>
-        <Link to="/courses" className="mt-4 inline-block text-primary font-semibold hover:underline">
+        <Link to="/courses" className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-xl inline-block font-semibold">
           ← Back to Courses
         </Link>
       </div>
@@ -172,98 +198,102 @@ export default function ModulePage() {
   }
 
   return (
-    <div className="space-y-10">
-      {/* Back */}
+    <div className="space-y-10 animate-in fade-in duration-700">
+      {/* Back button */}
       <Link
         to="/courses"
-        className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-medium bg-slate-100/70 px-4 py-2 rounded-xl text-sm"
+        className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-all font-bold bg-white p-2 pr-4 rounded-xl border border-slate-100 shadow-sm"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Courses
+        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+          <ArrowLeft className="w-4 h-4" />
+        </div>
+        Back
       </Link>
 
-      {/* Hero banner */}
-      <div className={`rounded-3xl bg-gradient-to-r ${config.gradient} p-8 sm:p-12 text-white shadow-lg relative overflow-hidden`}>
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, white 1px, transparent 1px)', backgroundSize: '28px 28px' }}
-        />
-        <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-2">L2 | G07</p>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-3">{config.name}</h1>
-        <p className="text-white/80 max-w-2xl leading-relaxed text-sm sm:text-base">{config.description}</p>
+      {/* Hero Banner */}
+      <div className={`rounded-[2.5rem] bg-gradient-to-r ${config.gradient} p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />
+        <div className="relative z-10">
+          <p className="text-white/70 text-[10px] font-black uppercase tracking-[0.3em] mb-3">Module Overview</p>
+          <h1 className="text-4xl sm:text-5xl font-black mb-4 tracking-tight">{config.name}</h1>
+          <p className="text-white/80 max-w-2xl leading-relaxed text-sm sm:text-lg font-medium">{config.description}</p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="space-y-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-20 rounded-2xl bg-slate-100 animate-pulse" />
-          ))}
+        <div className="flex flex-col items-center py-20 gap-4">
+          <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading materials...</p>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-10">
 
-          {/* ─── Left: Semesters ─────────────────────────────────────────── */}
-          <div className="lg:col-span-2 space-y-10">
-
-            {/* Semester 1 */}
+          {/* ─── Left: Course Materials ────────────────────────────────── */}
+          <div className="lg:col-span-2 space-y-12">
+            
+            {/* Semester 1 section */}
             <section>
-              <div className="flex items-center gap-3 mb-5">
-                <div className={`p-2 rounded-xl border ${config.badgeBg}`}>
-                  <GraduationCap className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-slate-800">Semester 1</h2>
-                  <p className="text-xs text-slate-400">{sem1.length} document{sem1.length !== 1 ? 's' : ''}</p>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-2xl border ${config.badgeBg} shadow-sm`}>
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Semester 01</h2>
+                    <p className="text-xs text-slate-400 font-bold uppercase">{sem1.length} Materials</p>
+                  </div>
                 </div>
               </div>
               {sem1.length > 0 ? (
-                <div className="space-y-3">
+                <div className="grid gap-4">
                   {sem1.map((l) => (
                     <PdfCard key={l.id} lesson={l} accent={config.accent} />
                   ))}
                 </div>
               ) : (
-                <EmptySection label="semester 1 courses" />
+                <EmptySection label="semester 1 courses" icon={FileText} />
               )}
             </section>
 
-            {/* Semester 2 */}
+            {/* Semester 2 section */}
             <section>
-              <div className="flex items-center gap-3 mb-5">
-                <div className={`p-2 rounded-xl border ${config.badgeBg}`}>
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-slate-800">Semester 2</h2>
-                  <p className="text-xs text-slate-400">{sem2.length} document{sem2.length !== 1 ? 's' : ''}</p>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-2xl border ${config.badgeBg} shadow-sm`}>
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Semester 02</h2>
+                    <p className="text-xs text-slate-400 font-bold uppercase">{sem2.length} Materials</p>
+                  </div>
                 </div>
               </div>
               {sem2.length > 0 ? (
-                <div className="space-y-3">
+                <div className="grid gap-4">
                   {sem2.map((l) => (
                     <PdfCard key={l.id} lesson={l} accent={config.accent} />
                   ))}
                 </div>
               ) : (
-                <EmptySection label="semester 2 courses" />
+                <EmptySection label="semester 2 courses" icon={BookOpen} />
               )}
             </section>
           </div>
 
-          {/* ─── Right: Assignments ──────────────────────────────────────── */}
-          <div>
-            <div className="flex items-center gap-3 mb-5">
-              <div className="p-2 bg-rose-50 text-rose-600 rounded-xl border border-rose-200">
+          {/* ─── Right: Assignments ────────────────────────────────────── */}
+          <aside className="space-y-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 bg-rose-50 text-rose-600 rounded-2xl border border-rose-100 shadow-sm">
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-800">Assignments</h2>
-                <p className="text-xs text-slate-400">{assignments.length} active</p>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Assignments</h2>
+                <p className="text-xs text-slate-400 font-bold uppercase">{assignments.length} Tasks active</p>
               </div>
             </div>
 
             {assignments.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {assignments.map((a) => {
                   const isOverdue = a.deadline ? new Date(a.deadline) < new Date() : false;
                   const isNew = new Date().getTime() - new Date(a.created_at).getTime() < 48 * 60 * 60 * 1000;
@@ -271,45 +301,40 @@ export default function ModulePage() {
                   return (
                     <div
                       key={a.id}
-                      className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 border-l-4 border-l-rose-500 relative transition-transform hover:scale-[1.02]"
+                      className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 border-l-8 border-l-rose-500 relative group hover:shadow-xl hover:-translate-y-1 transition-all"
                     >
                       {isNew && (
-                        <div className="absolute top-2 right-2 px-2 py-0.5 bg-rose-500 text-white text-[10px] font-black uppercase tracking-tighter rounded-md shadow-sm animate-pulse">
+                        <div className="absolute -top-2 -right-2 px-3 py-1 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg animate-bounce">
                           New
                         </div>
                       )}
-                      <h4 className="font-bold text-slate-800 mb-1 pr-8">{a.title}</h4>
+                      
+                      <h4 className="font-black text-slate-800 text-lg mb-2 pr-6 leading-tight">{a.title}</h4>
                       {a.description && (
-                         <p className="text-sm text-slate-600 mb-3 leading-relaxed">{a.description}</p>
+                         <p className="text-sm text-slate-500 mb-4 leading-relaxed font-medium">{a.description}</p>
                       )}
-                      <div className="flex flex-wrap gap-2">
-                        {a.deadline && (
-                          <div
-                            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg ${
-                              isOverdue
-                                ? 'bg-red-50 text-red-600 border border-red-200'
-                                : 'bg-rose-50 text-rose-600 border border-rose-200'
-                            }`}
-                          >
-                            <Clock className="w-3.5 h-3.5" />
-                            {isOverdue ? 'Overdue — ' : 'Due: '}
-                            {new Date(a.deadline).toLocaleDateString('en-GB', {
-                              day: 'numeric', month: 'short', year: 'numeric',
-                            })}
-                          </div>
-                        )}
-                      </div>
+                      
+                      {a.deadline && (
+                        <div
+                          className={`inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition-colors ${
+                            isOverdue
+                              ? 'bg-red-50 text-red-600 border border-red-100'
+                              : 'bg-rose-50 text-rose-600 border border-rose-100'
+                          }`}
+                        >
+                          <Clock className="w-3.5 h-3.5" />
+                          {isOverdue ? 'Overdue' : `Due: ${new Date(a.deadline).toLocaleDateString()}`}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <div className="py-10 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-                <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-sm text-slate-400 font-medium">No assignments yet.</p>
-              </div>
+              <EmptySection label="assignments" icon={Calendar} />
             )}
-          </div>
+          </aside>
+
         </div>
       )}
     </div>

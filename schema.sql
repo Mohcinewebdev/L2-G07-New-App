@@ -24,6 +24,27 @@ create policy "Users can insert their own profile." on profiles
 create policy "Users can update own profile." on profiles
   for update using (auth.uid() = id);
 
+-- ─── AUTH TRIGGER ────────────────────────────────────────────────────────────
+-- Automatically create a profile when a user signs up
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, name, role, module)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'role',
+    new.raw_user_meta_data->>'module'
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
 -- 2. Courses Table
 create table courses (
   id uuid default uuid_generate_v4() primary key,

@@ -44,7 +44,7 @@ export default function Register() {
         data: {
           full_name: name,
           role: role,
-          module: selectedModule,
+          module: role === 'teacher' ? selectedModule : null,
         },
         emailRedirectTo: `${window.location.origin}/dashboard`,
       },
@@ -58,16 +58,18 @@ export default function Register() {
 
     if (authData.user) {
       // Use upsert so it works even if a partial row already exists
-       const { error: profileError } = await supabase.from('profiles').upsert({
-         id: authData.user.id,
-         email: authData.user.email,
-         name: name,
-         role: role,
-         module: role === 'teacher' ? selectedModule : null,
-       });
+      // Fallback: manually upsert profile in case the trigger fails or RLS allows it
+      // This is less critical now that we have a database trigger
+      const { error: profileError } = await supabase.from('profiles').upsert({
+        id: authData.user.id,
+        email: authData.user.email,
+        name: name,
+        role: role,
+        module: role === 'teacher' ? selectedModule : null,
+      });
 
       if (profileError) {
-        console.error('Failed to create public profile:', profileError);
+        console.warn('Profile upsert skipped or failed (expected if email not confirmed):', profileError.message);
       }
 
       // FIX: if no session yet it means email confirmation is required.

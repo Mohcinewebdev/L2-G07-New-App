@@ -26,26 +26,31 @@ export default function Login() {
       return;
     }
 
-    // FIX: After login, ensure the profile row exists.
-    // If the email-confirmation redirect happened and the profile insert failed
-    // (due to RLS running before session was established), we create it here.
     if (data.user) {
+      const meta = data.user.user_metadata ?? {};
+
+      // Use maybeSingle() — returns null if not found instead of throwing
       const { data: profile } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, role, module')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
 
       if (!profile) {
-        // Profile missing — create it now from user_metadata
-        const meta = data.user.user_metadata ?? {};
+        // Profile missing (registered before trigger was added) — create it now
         await supabase.from('profiles').upsert({
-          id: data.user.id,
-          email: data.user.email,
-          name: meta.full_name ?? '',
-          role: meta.role ?? 'student',
-          module: meta.module ?? '',
+          id:     data.user.id,
+          email:  data.user.email,
+          name:   meta.full_name  ?? '',
+          role:   meta.role       ?? 'student',
+          module: meta.module     ?? '',
         });
+      } else if (!profile.module && meta.module) {
+        // Profile exists but module column is empty — patch it
+        await supabase
+          .from('profiles')
+          .update({ module: meta.module, role: meta.role ?? profile.role })
+          .eq('id', data.user.id);
       }
     }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Settings, Plus, Book, FileText, Upload, LogOut,
   X, Loader2, CheckCircle, Calendar, Edit2, Save, AlertCircle, BookOpen, GraduationCap
@@ -307,11 +307,11 @@ export default function Dashboard() {
         </div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Teacher Dashboard Only</h2>
         <p className="text-slate-500 mb-8 max-w-sm mx-auto">
-          Only registered faculty can access this area.
+          Only Teachers can access this area.
         </p>
-        <button onClick={handleSignOut} className="px-6 py-2 bg-slate-900 text-white rounded-xl font-medium inline-flex items-center gap-2">
-          <LogOut className="w-4 h-4" /> Sign Out
-        </button>
+        <Link to="/courses" className="px-6 py-2 bg-primary text-white rounded-xl font-medium inline-flex items-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/30">
+          <Book className="w-4 h-4" /> Go to Courses
+        </Link>
       </div>
     );
   }

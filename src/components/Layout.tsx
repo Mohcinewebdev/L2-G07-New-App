@@ -1,50 +1,17 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BookOpen, Home, Users, LogIn, Menu, X, LayoutDashboard, LogOut, User } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { cn } from '../lib/utils';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Track auth state to show user name next to sign-in button
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const name =
-          session.user.user_metadata?.full_name ||
-          session.user.email?.split('@')[0] ||
-          'User';
-        setUserName(name);
-      } else {
-        setUserName(null);
-      }
-    };
-
-    getUser();
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        const name =
-          session.user.user_metadata?.full_name ||
-          session.user.email?.split('@')[0] ||
-          'User';
-        setUserName(name);
-      } else {
-        setUserName(null);
-      }
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
+  const { userName, session, signOut: authSignOut } = useAuth();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUserName(null);
+    await authSignOut();
     navigate('/login');
     setIsMobileMenuOpen(false);
   };
@@ -96,7 +63,7 @@ export default function Layout() {
 
             {/* Desktop Auth section */}
             <div className="hidden md:flex items-center gap-3">
-              {userName ? (
+              {session ? (
                 // Logged-in: show user's name + dashboard link + sign out
                 <>
                   <Link
@@ -175,7 +142,7 @@ export default function Layout() {
               })}
 
               <div className="border-t border-gray-100 mt-2 pt-2 space-y-1">
-                {userName ? (
+                {session ? (
                   <>
                     <Link
                       to="/profile"

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft, FileText, Calendar, Clock, BookOpen,
-  GraduationCap, AlertCircle, FileDown, Loader2
+  GraduationCap, AlertCircle, FileDown, Loader2,
+  Trash2, Edit2, X, Save, Check
 } from 'lucide-react';
 
 // ─── Slug → module config ─────────────────────────────────────────────────────
@@ -82,9 +84,120 @@ interface Assignment {
   created_at: string;
 }
 
-function PdfCard({ lesson, accent }: { lesson: Lesson; accent: string }) {
+// ─── Inline Edit Component ────────────────────────────────────────────────────
+function InlineEdit({
+  value,
+  onSave,
+  onCancel,
+  label,
+  multiline,
+}: {
+  value: string;
+  onSave: (val: string) => void;
+  onCancel: () => void;
+  label: string;
+  multiline?: boolean;
+}) {
+  const [text, setText] = useState(value);
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-5 flex gap-4 items-start animate-in fade-in slide-in-from-left-2 transition-all">
+    <div className="flex flex-col gap-2">
+      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</label>
+      {multiline ? (
+        <textarea
+          autoFocus
+          rows={2}
+          value={text}
+          onChange={e => setText(e.target.value)}
+          className="w-full px-3 py-2 rounded-xl border border-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm font-medium text-slate-700 resize-none"
+        />
+      ) : (
+        <input
+          autoFocus
+          type="text"
+          value={text}
+          onChange={e => setText(e.target.value)}
+          className="w-full px-3 py-2 rounded-xl border border-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm font-medium text-slate-700"
+        />
+      )}
+      <div className="flex gap-2">
+        <button
+          onClick={() => onSave(text)}
+          className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors"
+        >
+          <Save className="w-3 h-3" /> Save
+        </button>
+        <button
+          onClick={onCancel}
+          className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors"
+        >
+          <X className="w-3 h-3" /> Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Delete Confirmation Modal ────────────────────────────────────────────────
+function DeleteConfirm({
+  itemName,
+  onConfirm,
+  onCancel,
+  loading,
+}: {
+  itemName: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center animate-in zoom-in-95 duration-300">
+        <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-rose-50 flex items-center justify-center">
+          <Trash2 className="w-8 h-8 text-rose-500" />
+        </div>
+        <h3 className="text-xl font-black text-slate-800 mb-2">Delete this item?</h3>
+        <p className="text-sm text-slate-500 mb-6 font-medium leading-relaxed">
+          Are you sure you want to delete <span className="font-bold text-slate-700">"{itemName}"</span>? This action cannot be undone.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="flex-1 py-3 px-4 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 py-3 px-4 rounded-2xl bg-rose-500 text-white font-bold hover:bg-rose-600 transition-all shadow-lg hover:shadow-rose-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── PDF Card ─────────────────────────────────────────────────────────────────
+function PdfCard({
+  lesson,
+  accent,
+  isTeacher,
+  onEdit,
+  onDelete,
+}: {
+  lesson: Lesson;
+  accent: string;
+  isTeacher: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-5 flex gap-4 items-start animate-in fade-in slide-in-from-left-2 transition-all group/card">
       <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
         <FileText className="w-6 h-6" />
       </div>
@@ -97,17 +210,37 @@ function PdfCard({ lesson, accent }: { lesson: Lesson; accent: string }) {
           Added {new Date(lesson.created_at).toLocaleDateString()}
         </p>
       </div>
-      {lesson.pdf_url && (
-        <a
-          href={lesson.pdf_url}
-          target="_blank"
-          rel="noreferrer"
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-current ${accent} hover:bg-slate-50 transition-colors shrink-0`}
-        >
-          <FileDown className="w-4 h-4" />
-          View PDF
-        </a>
-      )}
+      <div className="flex items-center gap-2 shrink-0">
+        {isTeacher && (
+          <>
+            <button
+              onClick={onEdit}
+              className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all opacity-0 group-hover/card:opacity-100"
+              title="Edit lesson"
+            >
+              <Edit2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onDelete}
+              className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all opacity-0 group-hover/card:opacity-100"
+              title="Delete lesson"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </>
+        )}
+        {lesson.pdf_url && (
+          <a
+            href={lesson.pdf_url}
+            target="_blank"
+            rel="noreferrer"
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-current ${accent} hover:bg-slate-50 transition-colors`}
+          >
+            <FileDown className="w-4 h-4" />
+            View PDF
+          </a>
+        )}
+      </div>
     </div>
   );
 }
@@ -124,66 +257,99 @@ function EmptySection({ label, icon: Icon }: { label: string; icon: any }) {
 export default function ModulePage() {
   const { slug } = useParams<{ slug: string }>();
   const config = slug ? MODULE_CONFIG[slug] : null;
+  const { isTeacher } = useAuth();
 
   const [sem1, setSem1] = useState<Lesson[]>([]);
   const [sem2, setSem2] = useState<Lesson[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!config) { setLoading(false); return; }
+  // Edit state
+  const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [editingAssignment, setEditingAssignment] = useState<string | null>(null);
 
-    async function load() {
-      if (!config) return;
-      setLoading(true);
-      
-      console.log(`[ModulePage] loading module: ${config.name}`);
+  // Delete state
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'lesson' | 'assignment'; id: string; title: string } | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-      // 1. Fetch ALL lessons to debug RLS vs Filter
-      const { data: allLessons, error: lError } = await supabase
-        .from('lessons')
-        .select('*');
+  const loadData = async () => {
+    if (!config) return;
+    setLoading(true);
 
-      if (lError) {
-        console.error(`[Lessons Error]:`, lError.message);
-      } else if (allLessons) {
-        console.log(`[Lessons Total in DB]:`, allLessons.length);
-        
-        // Match by module name (Case Insensitive & Trimmed)
-        const matched = allLessons.filter(l => 
-          l.module?.toString().trim().toLowerCase() === config.name.toLowerCase() ||
-          l.course_id === slug // or some other ID match
-        );
-        
-        setSem1(matched.filter(l => !l.semester || Number(l.semester) === 1));
-        setSem2(matched.filter(l => Number(l.semester) === 2));
-        
-        // Update diagnostic info with total unfiltered count
-        const debugDiv = document.getElementById('debug-info');
-        if (debugDiv) {
-           debugDiv.innerHTML += `<p>Total Lessons in Table: ${allLessons.length}</p>`;
-        }
-      }
+    // 1. Fetch ALL lessons
+    const { data: allLessons, error: lError } = await supabase
+      .from('lessons')
+      .select('*');
 
-      // 2. Fetch Assignments
-      const { data: allAsgn, error: aError } = await supabase
-        .from('assignments')
-        .select('*');
+    if (!lError && allLessons) {
+      const matched = allLessons.filter(l =>
+        l.module?.toString().trim().toLowerCase() === config.name.toLowerCase() ||
+        l.course_id === slug
+      );
 
-      if (aError) {
-        console.error(`[Assignments Error]:`, aError.message);
-      } else if (allAsgn) {
-        const matchedAsgn = allAsgn.filter(a => 
-          a.module?.toString().trim().toLowerCase() === config.name.toLowerCase()
-        );
-        setAssignments(matchedAsgn);
-      }
-      
-      setLoading(false);
+      setSem1(matched.filter(l => !l.semester || Number(l.semester) === 1));
+      setSem2(matched.filter(l => Number(l.semester) === 2));
     }
 
-    load();
+    // 2. Fetch Assignments
+    const { data: allAsgn, error: aError } = await supabase
+      .from('assignments')
+      .select('*');
+
+    if (!aError && allAsgn) {
+      const matchedAsgn = allAsgn.filter(a =>
+        a.module?.toString().trim().toLowerCase() === config.name.toLowerCase()
+      );
+      setAssignments(matchedAsgn);
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!config) { setLoading(false); return; }
+    loadData();
   }, [slug]);
+
+  // ─── Delete handler ──────────────────────────────────────────────────
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+
+    const table = deleteTarget.type === 'lesson' ? 'lessons' : 'assignments';
+    const { error } = await supabase.from(table).delete().eq('id', deleteTarget.id);
+
+    if (!error) {
+      if (deleteTarget.type === 'lesson') {
+        setSem1(prev => prev.filter(l => l.id !== deleteTarget.id));
+        setSem2(prev => prev.filter(l => l.id !== deleteTarget.id));
+      } else {
+        setAssignments(prev => prev.filter(a => a.id !== deleteTarget.id));
+      }
+    }
+
+    setDeleteLoading(false);
+    setDeleteTarget(null);
+  };
+
+  // ─── Edit handlers ──────────────────────────────────────────────────
+  const handleSaveLesson = async (id: string, newTitle: string) => {
+    const { error } = await supabase.from('lessons').update({ title: newTitle }).eq('id', id);
+    if (!error) {
+      const update = (l: Lesson) => l.id === id ? { ...l, title: newTitle } : l;
+      setSem1(prev => prev.map(update));
+      setSem2(prev => prev.map(update));
+    }
+    setEditingLesson(null);
+  };
+
+  const handleSaveAssignment = async (id: string, newTitle: string) => {
+    const { error } = await supabase.from('assignments').update({ title: newTitle }).eq('id', id);
+    if (!error) {
+      setAssignments(prev => prev.map(a => a.id === id ? { ...a, title: newTitle } : a));
+    }
+    setEditingAssignment(null);
+  };
 
   if (!config) {
     return (
@@ -246,9 +412,27 @@ export default function ModulePage() {
               </div>
               {sem1.length > 0 ? (
                 <div className="grid gap-4">
-                  {sem1.map((l) => (
-                    <PdfCard key={l.id} lesson={l} accent={config.accent} />
-                  ))}
+                  {sem1.map((l) =>
+                    editingLesson === l.id ? (
+                      <div key={l.id} className="bg-white rounded-2xl border-2 border-indigo-200 p-5 shadow-md">
+                        <InlineEdit
+                          value={l.title}
+                          label="Edit lesson title"
+                          onSave={(val) => handleSaveLesson(l.id, val)}
+                          onCancel={() => setEditingLesson(null)}
+                        />
+                      </div>
+                    ) : (
+                      <PdfCard
+                        key={l.id}
+                        lesson={l}
+                        accent={config.accent}
+                        isTeacher={isTeacher}
+                        onEdit={() => setEditingLesson(l.id)}
+                        onDelete={() => setDeleteTarget({ type: 'lesson', id: l.id, title: l.title })}
+                      />
+                    )
+                  )}
                 </div>
               ) : (
                 <EmptySection label="semester 1 courses" icon={FileText} />
@@ -270,9 +454,27 @@ export default function ModulePage() {
               </div>
               {sem2.length > 0 ? (
                 <div className="grid gap-4">
-                  {sem2.map((l) => (
-                    <PdfCard key={l.id} lesson={l} accent={config.accent} />
-                  ))}
+                  {sem2.map((l) =>
+                    editingLesson === l.id ? (
+                      <div key={l.id} className="bg-white rounded-2xl border-2 border-indigo-200 p-5 shadow-md">
+                        <InlineEdit
+                          value={l.title}
+                          label="Edit lesson title"
+                          onSave={(val) => handleSaveLesson(l.id, val)}
+                          onCancel={() => setEditingLesson(null)}
+                        />
+                      </div>
+                    ) : (
+                      <PdfCard
+                        key={l.id}
+                        lesson={l}
+                        accent={config.accent}
+                        isTeacher={isTeacher}
+                        onEdit={() => setEditingLesson(l.id)}
+                        onDelete={() => setDeleteTarget({ type: 'lesson', id: l.id, title: l.title })}
+                      />
+                    )
+                  )}
                 </div>
               ) : (
                 <EmptySection label="semester 2 courses" icon={BookOpen} />
@@ -297,23 +499,56 @@ export default function ModulePage() {
                 {assignments.map((a) => {
                   const isOverdue = a.deadline ? new Date(a.deadline) < new Date() : false;
                   const isNew = new Date().getTime() - new Date(a.created_at).getTime() < 48 * 60 * 60 * 1000;
-                  
+
+                  if (editingAssignment === a.id) {
+                    return (
+                      <div key={a.id} className="bg-white rounded-3xl border-2 border-indigo-200 p-6 shadow-md">
+                        <InlineEdit
+                          value={a.title}
+                          label="Edit assignment title"
+                          onSave={(val) => handleSaveAssignment(a.id, val)}
+                          onCancel={() => setEditingAssignment(null)}
+                        />
+                      </div>
+                    );
+                  }
+
                   return (
                     <div
                       key={a.id}
-                      className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 border-l-8 border-l-rose-500 relative group hover:shadow-xl hover:-translate-y-1 transition-all"
+                      className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 border-l-8 border-l-rose-500 relative group/asg hover:shadow-xl hover:-translate-y-1 transition-all"
                     >
                       {isNew && (
                         <div className="absolute -top-2 -right-2 px-3 py-1 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg animate-bounce">
                           New
                         </div>
                       )}
-                      
+
+                      {/* Teacher actions */}
+                      {isTeacher && (
+                        <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover/asg:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setEditingAssignment(a.id)}
+                            className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                            title="Edit assignment"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget({ type: 'assignment', id: a.id, title: a.title })}
+                            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                            title="Delete assignment"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+
                       <h4 className="font-black text-slate-800 text-lg mb-2 pr-6 leading-tight">{a.title}</h4>
                       {a.description && (
-                         <p className="text-sm text-slate-500 mb-4 leading-relaxed font-medium">{a.description}</p>
+                        <p className="text-sm text-slate-500 mb-4 leading-relaxed font-medium">{a.description}</p>
                       )}
-                      
+
                       {a.deadline && (
                         <div
                           className={`inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition-colors ${
@@ -336,6 +571,16 @@ export default function ModulePage() {
           </aside>
 
         </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <DeleteConfirm
+          itemName={deleteTarget.title}
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteTarget(null)}
+          loading={deleteLoading}
+        />
       )}
     </div>
   );

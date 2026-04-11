@@ -196,17 +196,17 @@ export default function CourseDetail() {
               <div key={lesson.id} className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/60 shadow-sm group/lesson relative">
                 {/* Teacher actions */}
                 {isTeacher && (
-                  <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
+                  <div className="absolute top-4 right-4 flex gap-1">
                     <button
                       onClick={() => { setEditingLesson(lesson.id); setEditLessonTitle(lesson.title); }}
-                      className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                      className="p-2 rounded-xl text-indigo-500 bg-indigo-50 hover:text-indigo-700 hover:bg-indigo-100 transition-all"
                       title="Edit lesson"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setDeleteTarget({ type: 'lesson', id: lesson.id, title: lesson.title })}
-                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                      className="p-2 rounded-xl text-rose-500 bg-rose-50 hover:text-rose-700 hover:bg-rose-100 transition-all"
                       title="Delete lesson"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -305,17 +305,17 @@ export default function CourseDetail() {
               <div key={assignment.id} className="card-hover glass-panel p-5 rounded-2xl shadow-sm border-l-4 border-l-rose-500 relative overflow-hidden bg-white/60 group/asg">
                 {/* Teacher actions */}
                 {isTeacher && (
-                  <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover/asg:opacity-100 transition-opacity">
+                  <div className="absolute top-3 right-3 flex gap-1">
                     <button
                       onClick={() => { setEditingAssignment(assignment.id); setEditAssignmentTitle(assignment.title); }}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                      className="p-1.5 rounded-lg text-indigo-500 bg-indigo-50 hover:text-indigo-700 hover:bg-indigo-100 transition-all"
                       title="Edit assignment"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setDeleteTarget({ type: 'assignment', id: assignment.id, title: assignment.title })}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                      className="p-1.5 rounded-lg text-rose-500 bg-rose-50 hover:text-rose-700 hover:bg-rose-100 transition-all"
                       title="Delete assignment"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

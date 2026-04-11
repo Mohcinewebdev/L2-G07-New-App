@@ -197,11 +197,11 @@ function PdfCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-5 flex gap-4 items-start animate-in fade-in slide-in-from-left-2 transition-all group/card">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start animate-in fade-in slide-in-from-left-2 transition-all">
       <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
         <FileText className="w-6 h-6" />
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 w-full">
         <h4 className="font-semibold text-slate-800 text-base leading-tight">{lesson.title}</h4>
         {lesson.description && (
           <p className="text-sm text-slate-500 mt-1 line-clamp-2">{lesson.description}</p>
@@ -210,19 +210,19 @@ function PdfCard({
           Added {new Date(lesson.created_at).toLocaleDateString()}
         </p>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-2 shrink-0 flex-wrap w-full sm:w-auto">
         {isTeacher && (
           <>
             <button
               onClick={onEdit}
-              className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all opacity-0 group-hover/card:opacity-100"
+              className="p-2 rounded-xl text-indigo-500 bg-indigo-50 hover:text-indigo-700 hover:bg-indigo-100 transition-all"
               title="Edit lesson"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={onDelete}
-              className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all opacity-0 group-hover/card:opacity-100"
+              className="p-2 rounded-xl text-rose-500 bg-rose-50 hover:text-rose-700 hover:bg-rose-100 transition-all"
               title="Delete lesson"
             >
               <Trash2 className="w-4 h-4" />
@@ -377,11 +377,11 @@ export default function ModulePage() {
       </Link>
 
       {/* Hero Banner */}
-      <div className={`rounded-[2.5rem] bg-gradient-to-r ${config.gradient} p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden`}>
+      <div className={`rounded-2xl sm:rounded-[2.5rem] bg-gradient-to-r ${config.gradient} p-6 sm:p-12 text-white shadow-2xl relative overflow-hidden`}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />
         <div className="relative z-10">
           <p className="text-white/70 text-[10px] font-black uppercase tracking-[0.3em] mb-3">Module Overview</p>
-          <h1 className="text-4xl sm:text-5xl font-black mb-4 tracking-tight">{config.name}</h1>
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black mb-4 tracking-tight">{config.name}</h1>
           <p className="text-white/80 max-w-2xl leading-relaxed text-sm sm:text-lg font-medium">{config.description}</p>
         </div>
       </div>
@@ -392,7 +392,7 @@ export default function ModulePage() {
           <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading materials...</p>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
 
           {/* ─── Left: Course Materials ────────────────────────────────── */}
           <div className="lg:col-span-2 space-y-12">
@@ -516,7 +516,7 @@ export default function ModulePage() {
                   return (
                     <div
                       key={a.id}
-                      className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 border-l-8 border-l-rose-500 relative group/asg hover:shadow-xl hover:-translate-y-1 transition-all"
+                      className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 sm:p-6 border-l-8 border-l-rose-500 relative hover:shadow-xl hover:-translate-y-1 transition-all"
                     >
                       {isNew && (
                         <div className="absolute -top-2 -right-2 px-3 py-1 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg animate-bounce">
@@ -526,17 +526,17 @@ export default function ModulePage() {
 
                       {/* Teacher actions */}
                       {isTeacher && (
-                        <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover/asg:opacity-100 transition-opacity">
+                        <div className="absolute top-4 right-4 flex gap-1">
                           <button
                             onClick={() => setEditingAssignment(a.id)}
-                            className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                            className="p-2 rounded-xl text-indigo-500 bg-indigo-50 hover:text-indigo-700 hover:bg-indigo-100 transition-all"
                             title="Edit assignment"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeleteTarget({ type: 'assignment', id: a.id, title: a.title })}
-                            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                            className="p-2 rounded-xl text-rose-500 bg-rose-50 hover:text-rose-700 hover:bg-rose-100 transition-all"
                             title="Delete assignment"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -544,7 +544,7 @@ export default function ModulePage() {
                         </div>
                       )}
 
-                      <h4 className="font-black text-slate-800 text-lg mb-2 pr-6 leading-tight">{a.title}</h4>
+                      <h4 className="font-black text-slate-800 text-lg mb-2 pr-16 leading-tight">{a.title}</h4>
                       {a.description && (
                         <p className="text-sm text-slate-500 mb-4 leading-relaxed font-medium">{a.description}</p>
                       )}

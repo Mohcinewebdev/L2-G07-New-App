@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft, ExternalLink, PlayCircle, FileText, Calendar, Clock,
-  Trash2, Edit2, X, Save, Loader2
+  Trash2, Edit2, X, Save, Loader2, FileDown
 } from 'lucide-react';
 
 interface Course {
@@ -71,6 +71,24 @@ function DeleteConfirm({
       </div>
     </div>
   );
+}
+
+// ─── Download helper ──────────────────────────────────────────────────────────
+async function handleDownloadPdf(url: string, title: string) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `${title.replace(/[^a-zA-Z0-9-_ ]/g, '')}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(blobUrl);
+  } catch {
+    window.open(url, '_blank');
+  }
 }
 
 export default function CourseDetail() {
@@ -265,15 +283,24 @@ export default function CourseDetail() {
                             <h4 className="font-semibold text-slate-700 truncate">Document Attachment</h4>
                             <p className="text-xs text-slate-500 mt-0.5">PDF Format</p>
                           </div>
-                          <a 
-                            href={lesson.pdf_url} 
-                            target="_blank" 
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-semibold rounded-lg shadow-sm border border-slate-200 hover:border-primary/50 hover:bg-slate-50 transition-all shrink-0"
-                          >
-                            View PDF
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
+                          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                            <button
+                              onClick={() => handleDownloadPdf(lesson.pdf_url, lesson.title)}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-slate-800 transition-all"
+                            >
+                              <FileDown className="w-4 h-4" />
+                              Download
+                            </button>
+                            <a 
+                              href={lesson.pdf_url} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-semibold rounded-lg shadow-sm border border-slate-200 hover:border-primary/50 hover:bg-slate-50 transition-all"
+                            >
+                              View PDF
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </div>
                         </div>
                       )}
                     </div>

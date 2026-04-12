@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft, FileText, Calendar, Clock, BookOpen,
   GraduationCap, AlertCircle, FileDown, Loader2,
-  Trash2, Edit2, X, Save, Check
+  Trash2, Edit2, X, Save, Check, ExternalLink
 } from 'lucide-react';
 
 // ─── Slug → module config ─────────────────────────────────────────────────────
@@ -182,6 +182,25 @@ function DeleteConfirm({
   );
 }
 
+// ─── Download helper ──────────────────────────────────────────────────────────
+async function handleDownloadPdf(url: string, title: string) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `${title.replace(/[^a-zA-Z0-9-_ ]/g, '')}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(blobUrl);
+  } catch {
+    // Fallback: open in new tab if fetch fails
+    window.open(url, '_blank');
+  }
+}
+
 // ─── PDF Card ─────────────────────────────────────────────────────────────────
 function PdfCard({
   lesson,
@@ -230,15 +249,24 @@ function PdfCard({
           </>
         )}
         {lesson.pdf_url && (
-          <a
-            href={lesson.pdf_url}
-            target="_blank"
-            rel="noreferrer"
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-current ${accent} hover:bg-slate-50 transition-colors`}
-          >
-            <FileDown className="w-4 h-4" />
-            View PDF
-          </a>
+          <>
+            <button
+              onClick={() => handleDownloadPdf(lesson.pdf_url!, lesson.title)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
+            >
+              <FileDown className="w-4 h-4" />
+              Download
+            </button>
+            <a
+              href={lesson.pdf_url}
+              target="_blank"
+              rel="noreferrer"
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-current ${accent} hover:bg-slate-50 transition-colors`}
+            >
+              <ExternalLink className="w-4 h-4" />
+              View PDF
+            </a>
+          </>
         )}
       </div>
     </div>

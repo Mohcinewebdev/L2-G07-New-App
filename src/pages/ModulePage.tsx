@@ -307,7 +307,8 @@ export default function ModulePage() {
     // 1. Fetch ALL lessons
     const { data: allLessons, error: lError } = await supabase
       .from('lessons')
-      .select('*');
+      .select('*')
+      .order('id');
 
     if (!lError && allLessons) {
       const matched = allLessons.filter(l =>

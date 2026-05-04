@@ -119,7 +119,7 @@ export default function CourseDetail() {
         setCourse(courseData);
         const cName = courseData.name;
         const [lRes, aRes] = await Promise.all([
-          supabase.from('lessons').select('*').or(`course_id.eq.${id},module.eq."${cName}"`).order('created_at', { ascending: false }),
+          supabase.from('lessons').select('*').or(`course_id.eq.${id},module.eq."${cName}"`).order('id'),
           supabase.from('assignments').select('*').or(`course_id.eq.${id},module.eq."${cName}"`).order('deadline', { ascending: true }),
         ]);
         setLessons(lRes.data || []);

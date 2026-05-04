@@ -60,34 +60,34 @@ export default function Login() {
   return (
     <div className="flex items-center justify-center min-h-[70vh]">
       <div className="w-full max-w-md">
-        <div className="glass-panel p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col bg-white">
+        <div className="glass-panel p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
           <div className="flex justify-center mb-8">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-2xl shadow-inner">
               L2
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-center text-slate-800 mb-2">Welcome Back</h2>
-          <p className="text-center text-slate-500 mb-8 font-medium">
+          <h2 className="text-3xl font-bold text-center text-slate-800 dark:text-slate-100 mb-2">Welcome Back</h2>
+          <p className="text-center text-slate-500 dark:text-slate-400 mb-8 font-medium">
             Sign in to access your dashboard
           </p>
 
           <form onSubmit={handleLogin} className="space-y-6">
             {error && (
-              <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium border border-red-100 dark:border-red-900/30">
                 {error}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 block" htmlFor="email">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block" htmlFor="email">
                 Email Address
               </label>
               <input
                 id="email"
                 type="email"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 font-medium"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium text-slate-700 dark:text-slate-200"
                 placeholder="you@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -95,14 +95,14 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 block" htmlFor="password">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block" htmlFor="password">
                 Password
               </label>
               <input
                 id="password"
                 type="password"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 font-medium"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium text-slate-700 dark:text-slate-200"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -125,7 +125,7 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm font-medium text-slate-500">
+          <p className="mt-8 text-center text-sm font-medium text-slate-500 dark:text-slate-400">
             Don't have an account?{' '}
             <Link to="/register" className="text-primary hover:text-primary-dark font-bold hover:underline">
               Register here

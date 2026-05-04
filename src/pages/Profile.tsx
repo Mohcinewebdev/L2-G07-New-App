@@ -56,10 +56,10 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="border-b border-gray-200 pb-6 flex justify-between items-end">
+      <div className="border-b border-gray-200 dark:border-slate-800 pb-6 flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Your Profile</h1>
-          <p className="text-slate-500 mt-1">Manage your identity and account settings</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Your Profile</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your identity and account settings</p>
         </div>
         {success && (
           <div className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-xl text-sm font-bold border border-green-100 animate-in zoom-in">
@@ -68,7 +68,7 @@ export default function Profile() {
         )}
       </div>
 
-      <div className="glass-panel bg-white/50 rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden">
+      <div className="glass-panel bg-white/50 dark:bg-slate-900/50 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden">
         {/* Header decoration */}
         <div className="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 relative">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]" />
@@ -76,17 +76,17 @@ export default function Profile() {
 
         {/* Profile Content */}
         <div className="px-8 pb-10 -mt-12 relative flex flex-col items-center">
-          <div className="w-24 h-24 rounded-3xl bg-white p-1.5 shadow-2xl mb-6">
-            <div className="w-full h-full rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50 flex items-center justify-center text-indigo-600 border border-slate-100">
+          <div className="w-24 h-24 rounded-3xl bg-white dark:bg-slate-900 p-1.5 shadow-2xl mb-6">
+            <div className="w-full h-full rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50 dark:from-slate-800 dark:to-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-slate-100 dark:border-slate-800">
               <User className="w-10 h-10" />
             </div>
           </div>
 
           <div className="w-full space-y-6 max-w-md mx-auto">
             {/* Identity section */}
-            <div className="group relative bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
+            <div className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Full Name</span>
                 {!editing && (
                   <button 
                     onClick={() => setEditing(true)}
@@ -102,7 +102,7 @@ export default function Profile() {
                   <input 
                     autoFocus
                     type="text"
-                    className="flex-1 px-4 py-2 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 outline-none font-bold text-slate-800 transition-all"
+                    className="flex-1 px-4 py-2 rounded-xl border-2 border-indigo-100 dark:border-indigo-900/50 focus:border-indigo-500 outline-none font-bold text-slate-800 dark:text-slate-100 dark:bg-slate-950 transition-all"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSave()}
@@ -116,41 +116,41 @@ export default function Profile() {
                   </button>
                   <button 
                     onClick={() => { setEditing(false); setNewName(profile.name); }}
-                    className="bg-slate-100 text-slate-500 p-2.5 rounded-xl hover:bg-slate-200"
+                    className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-2.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               ) : (
-                <h3 className="text-2xl font-black text-slate-800">{profile.name || 'Unnamed User'}</h3>
+                <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100">{profile.name || 'Unnamed User'}</h3>
               )}
             </div>
 
             {/* Email & Role Info */}
             <div className="grid grid-cols-2 gap-4">
-               <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-5">
-                  <div className="flex items-center gap-2 text-indigo-500 mb-2">
+               <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+                  <div className="flex items-center gap-2 text-indigo-500 dark:text-indigo-400 mb-2">
                      <Mail className="w-4 h-4" />
                      <span className="text-[10px] font-black uppercase tracking-widest">Email</span>
                   </div>
-                  <p className="text-sm font-bold text-slate-700 truncate">{profile.email}</p>
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">{profile.email}</p>
                </div>
-               <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-5">
-                  <div className="flex items-center gap-2 text-indigo-500 mb-2">
+               <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+                  <div className="flex items-center gap-2 text-indigo-500 dark:text-indigo-400 mb-2">
                      <Shield className="w-4 h-4" />
                      <span className="text-[10px] font-black uppercase tracking-widest">Role</span>
                   </div>
-                  <p className="text-sm font-bold text-slate-700 capitalize">{profile.role}</p>
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300 capitalize">{profile.role}</p>
                </div>
             </div>
 
             {profile.module && (
-               <div className="bg-indigo-50/50 rounded-2xl border border-indigo-100/50 p-5 flex items-center justify-between">
+               <div className="bg-indigo-50/50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100/50 dark:border-indigo-900/30 p-5 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 block mb-1">Module</span>
-                    <p className="font-bold text-indigo-900">{profile.module}</p>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 dark:text-indigo-500 block mb-1">Module</span>
+                    <p className="font-bold text-indigo-900 dark:text-indigo-100">{profile.module}</p>
                   </div>
-                  <Edit2 className="w-5 h-5 text-indigo-200" />
+                  <Edit2 className="w-5 h-5 text-indigo-200 dark:text-indigo-800" />
                </div>
             )}
           </div>

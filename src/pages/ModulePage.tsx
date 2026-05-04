@@ -109,7 +109,7 @@ function InlineEdit({
           rows={2}
           value={text}
           onChange={e => setText(e.target.value)}
-          className="w-full px-3 py-2 rounded-xl border border-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm font-medium text-slate-700 resize-none"
+          className="w-full px-3 py-2 rounded-xl border border-indigo-300 dark:border-indigo-800 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900/20 outline-none text-sm font-medium text-slate-700 dark:text-slate-200 resize-none"
         />
       ) : (
         <input
@@ -117,7 +117,7 @@ function InlineEdit({
           type="text"
           value={text}
           onChange={e => setText(e.target.value)}
-          className="w-full px-3 py-2 rounded-xl border border-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm font-medium text-slate-700"
+          className="w-full px-3 py-2 rounded-xl border border-indigo-300 dark:border-indigo-800 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900/20 outline-none text-sm font-medium text-slate-700 dark:text-slate-200"
         />
       )}
       <div className="flex gap-2">
@@ -129,7 +129,7 @@ function InlineEdit({
         </button>
         <button
           onClick={onCancel}
-          className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
         >
           <X className="w-3 h-3" /> Cancel
         </button>
@@ -151,20 +151,20 @@ function DeleteConfirm({
   loading: boolean;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center animate-in zoom-in-95 duration-300">
-        <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-rose-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center animate-in zoom-in-95 duration-300 border border-slate-200 dark:border-slate-800">
+        <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center">
           <Trash2 className="w-8 h-8 text-rose-500" />
         </div>
-        <h3 className="text-xl font-black text-slate-800 mb-2">Delete this item?</h3>
-        <p className="text-sm text-slate-500 mb-6 font-medium leading-relaxed">
-          Are you sure you want to delete <span className="font-bold text-slate-700">"{itemName}"</span>? This action cannot be undone.
+        <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-2">Delete this item?</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-medium leading-relaxed">
+          Are you sure you want to delete <span className="font-bold text-slate-700 dark:text-slate-300">"{itemName}"</span>? This action cannot be undone.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 py-3 px-4 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition-colors"
+            className="flex-1 py-3 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             Cancel
           </button>
@@ -216,16 +216,16 @@ function PdfCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start animate-in fade-in slide-in-from-left-2 transition-all">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start animate-in fade-in slide-in-from-left-2 transition-all">
       <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
         <FileText className="w-6 h-6" />
       </div>
       <div className="flex-1 min-w-0 w-full">
-        <h4 className="font-semibold text-slate-800 text-base leading-tight">{lesson.title}</h4>
+        <h4 className="font-semibold text-slate-800 dark:text-slate-100 text-base leading-tight">{lesson.title}</h4>
         {lesson.description && (
-          <p className="text-sm text-slate-500 mt-1 line-clamp-2">{lesson.description}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{lesson.description}</p>
         )}
-        <p className="text-xs text-slate-400 mt-2">
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
           Added {new Date(lesson.created_at).toLocaleDateString()}
         </p>
       </div>
@@ -234,14 +234,14 @@ function PdfCard({
           <>
             <button
               onClick={onEdit}
-              className="p-2 rounded-xl text-indigo-500 bg-indigo-50 hover:text-indigo-700 hover:bg-indigo-100 transition-all"
+              className="p-2 rounded-xl text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 hover:text-indigo-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all"
               title="Edit lesson"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={onDelete}
-              className="p-2 rounded-xl text-rose-500 bg-rose-50 hover:text-rose-700 hover:bg-rose-100 transition-all"
+              className="p-2 rounded-xl text-rose-500 bg-rose-50 dark:bg-rose-900/30 hover:text-rose-700 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-all"
               title="Delete lesson"
             >
               <Trash2 className="w-4 h-4" />
@@ -261,7 +261,7 @@ function PdfCard({
               href={lesson.pdf_url}
               target="_blank"
               rel="noreferrer"
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-current ${accent} hover:bg-slate-50 transition-colors`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-current ${accent} hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors`}
             >
               <ExternalLink className="w-4 h-4" />
               View PDF
@@ -275,9 +275,9 @@ function PdfCard({
 
 function EmptySection({ label, icon: Icon }: { label: string; icon: any }) {
   return (
-    <div className="py-12 rounded-2xl border-2 border-dashed border-slate-200 text-center bg-slate-50/50">
-      <Icon className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-      <p className="text-sm text-slate-400 font-bold uppercase tracking-wider">No {label} available</p>
+    <div className="py-12 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 text-center bg-slate-50/50 dark:bg-slate-900/50">
+      <Icon className="w-10 h-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
+      <p className="text-sm text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">No {label} available</p>
     </div>
   );
 }
@@ -396,9 +396,9 @@ export default function ModulePage() {
       {/* Back button */}
       <Link
         to="/courses"
-        className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-all font-bold bg-white p-2 pr-4 rounded-xl border border-slate-100 shadow-sm"
+        className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-primary transition-all font-bold bg-white dark:bg-slate-900 p-2 pr-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm"
       >
-        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
           <ArrowLeft className="w-4 h-4" />
         </div>
         Back
@@ -433,8 +433,8 @@ export default function ModulePage() {
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Semester 01</h2>
-                    <p className="text-xs text-slate-400 font-bold uppercase">{sem1.length} Materials</p>
+                    <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Semester 01</h2>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase">{sem1.length} Materials</p>
                   </div>
                 </div>
               </div>
@@ -475,8 +475,8 @@ export default function ModulePage() {
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Semester 02</h2>
-                    <p className="text-xs text-slate-400 font-bold uppercase">{sem2.length} Materials</p>
+                    <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Semester 02</h2>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase">{sem2.length} Materials</p>
                   </div>
                 </div>
               </div>
@@ -517,8 +517,8 @@ export default function ModulePage() {
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Assignments</h2>
-                <p className="text-xs text-slate-400 font-bold uppercase">{assignments.length} Tasks active</p>
+                <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Assignments</h2>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase">{assignments.length} Tasks active</p>
               </div>
             </div>
 
@@ -530,7 +530,7 @@ export default function ModulePage() {
 
                   if (editingAssignment === a.id) {
                     return (
-                      <div key={a.id} className="bg-white rounded-3xl border-2 border-indigo-200 p-6 shadow-md">
+                      <div key={a.id} className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-indigo-200 dark:border-indigo-800 p-6 shadow-md">
                         <InlineEdit
                           value={a.title}
                           label="Edit assignment title"
@@ -544,7 +544,7 @@ export default function ModulePage() {
                   return (
                     <div
                       key={a.id}
-                      className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 sm:p-6 border-l-8 border-l-rose-500 relative hover:shadow-xl hover:-translate-y-1 transition-all"
+                      className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 sm:p-6 border-l-8 border-l-rose-500 relative hover:shadow-xl hover:-translate-y-1 transition-all"
                     >
                       {isNew && (
                         <div className="absolute -top-2 -right-2 px-3 py-1 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg animate-bounce">
@@ -557,14 +557,14 @@ export default function ModulePage() {
                         <div className="absolute top-4 right-4 flex gap-1">
                           <button
                             onClick={() => setEditingAssignment(a.id)}
-                            className="p-2 rounded-xl text-indigo-500 bg-indigo-50 hover:text-indigo-700 hover:bg-indigo-100 transition-all"
+                            className="p-2 rounded-xl text-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 hover:text-indigo-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all"
                             title="Edit assignment"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeleteTarget({ type: 'assignment', id: a.id, title: a.title })}
-                            className="p-2 rounded-xl text-rose-500 bg-rose-50 hover:text-rose-700 hover:bg-rose-100 transition-all"
+                            className="p-2 rounded-xl text-rose-500 bg-rose-50 dark:bg-rose-950/30 hover:text-rose-700 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-all"
                             title="Delete assignment"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -572,17 +572,17 @@ export default function ModulePage() {
                         </div>
                       )}
 
-                      <h4 className="font-black text-slate-800 text-lg mb-2 pr-16 leading-tight">{a.title}</h4>
+                      <h4 className="font-black text-slate-800 dark:text-slate-100 text-lg mb-2 pr-16 leading-tight">{a.title}</h4>
                       {a.description && (
-                        <p className="text-sm text-slate-500 mb-4 leading-relaxed font-medium">{a.description}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 leading-relaxed font-medium">{a.description}</p>
                       )}
 
                       {a.deadline && (
                         <div
                           className={`inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition-colors ${
                             isOverdue
-                              ? 'bg-red-50 text-red-600 border border-red-100'
-                              : 'bg-rose-50 text-rose-600 border border-rose-100'
+                              ? 'bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30'
+                              : 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30'
                           }`}
                         >
                           <Clock className="w-3.5 h-3.5" />

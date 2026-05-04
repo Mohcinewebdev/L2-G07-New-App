@@ -50,7 +50,7 @@ function SelectInput({
           if (c) onChange({ id: c.id, name: c.name });
         }}
         disabled={disabled}
-        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 outline-none font-medium text-slate-700 bg-white appearance-none cursor-pointer pr-10 disabled:opacity-60"
+        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 outline-none font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-950 appearance-none cursor-pointer pr-10 disabled:opacity-60"
       >
         <option value="">— Select a module —</option>
         {courses.map((c) => (
@@ -73,12 +73,12 @@ function SemesterToggle({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex p-1 bg-slate-100 rounded-xl w-full">
+    <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-full">
       <button
         type="button"
         onClick={() => onChange(1)}
         className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold rounded-lg transition-all ${
-          value === 1 ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+          value === 1 ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
         }`}
       >
         <BookOpen className="w-4 h-4" />
@@ -88,7 +88,7 @@ function SemesterToggle({
         type="button"
         onClick={() => onChange(2)}
         className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold rounded-lg transition-all ${
-          value === 2 ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+          value === 2 ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
         }`}
       >
         <GraduationCap className="w-4 h-4" />
@@ -102,7 +102,7 @@ function SuccessScreen({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-center py-10 gap-3">
       <CheckCircle className="w-14 h-14 text-green-500" />
-      <p className="font-semibold text-slate-700 text-lg text-center">{message}</p>
+      <p className="font-semibold text-slate-700 dark:text-slate-300 text-lg text-center">{message}</p>
     </div>
   );
 }
@@ -297,16 +297,16 @@ export default function Dashboard() {
   };
 
   if (loading)
-    return <div className="text-center py-20 font-medium text-slate-500">Loading dashboard...</div>;
+    return <div className="text-center py-20 font-medium text-slate-500 dark:text-slate-400">Loading dashboard...</div>;
 
   if (role !== 'teacher') {
     return (
       <div className="text-center py-20 px-4">
-        <div className="inline-flex p-4 rounded-3xl bg-rose-50 text-rose-500 mb-4">
+        <div className="inline-flex p-4 rounded-3xl bg-rose-50 dark:bg-rose-950/30 text-rose-500 mb-4">
           <Settings className="w-12 h-12" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Teacher Dashboard Only</h2>
-        <p className="text-slate-500 mb-8 max-w-sm mx-auto">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Teacher Dashboard Only</h2>
+        <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-sm mx-auto">
           Only Teachers can access this area.
         </p>
         <Link to="/courses" className="px-6 py-2 bg-primary text-white rounded-xl font-medium inline-flex items-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/30">
@@ -319,7 +319,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 dark:border-slate-800 pb-6">
         <div>
           {editingName ? (
             <div className="flex items-center gap-2">
@@ -329,31 +329,31 @@ export default function Dashboard() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
-                className="text-2xl font-bold text-slate-900 border-b-2 border-indigo-400 outline-none bg-transparent w-64"
+                className="text-2xl font-bold text-slate-900 dark:text-slate-100 border-b-2 border-indigo-400 outline-none bg-transparent w-64"
               />
-              <button onClick={handleSaveName} disabled={savingName} className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors">
+              <button onClick={handleSaveName} disabled={savingName} className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
                 {savingName ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               </button>
-              <button onClick={() => setEditingName(false)} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors">
+              <button onClick={() => setEditingName(false)} className="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Dashboard</h1>
               <button
                 onClick={() => { setNewName(userName); setEditingName(true); }}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                className="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
                 title="Edit your name"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
             </div>
           )}
-          <p className="text-slate-500 mt-1">
-            Welcome, <span className="font-semibold text-slate-700">{userName}</span>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            Welcome, <span className="font-semibold text-slate-700 dark:text-slate-300">{userName}</span>
             {teacherModule && (
-              <> — <span className="text-indigo-600 font-medium">{teacherModule}</span> faculty</>
+              <> — <span className="text-indigo-600 dark:text-indigo-400 font-medium">{teacherModule}</span> faculty</>
             )}
           </p>
         </div>
@@ -361,7 +361,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           <button 
             onClick={handleSignOut}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 font-medium transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Sign Out
@@ -373,13 +373,13 @@ export default function Dashboard() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div 
           onClick={() => setActiveModal('lesson')}
-          className="glass-panel p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group bg-white/50"
+          className="glass-panel p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group bg-white/50 dark:bg-slate-900/50"
         >
           <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
             <Upload className="w-7 h-7" />
           </div>
-          <h3 className="text-xl font-bold text-slate-800 mb-2">Upload Course</h3>
-          <p className="text-slate-500 text-sm leading-relaxed mb-6">Create a new lesson by uploading a PDF material directly from your device.</p>
+          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Upload Course</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">Create a new lesson by uploading a PDF material directly from your device.</p>
           <div className="flex items-center justify-between text-indigo-600 font-bold text-sm">
              <span>Get Started</span>
              <Plus className="w-4 h-4" />
@@ -388,13 +388,13 @@ export default function Dashboard() {
 
         <div 
           onClick={() => setActiveModal('assignment')}
-          className="glass-panel p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group bg-white/50"
+          className="glass-panel p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group bg-white/50 dark:bg-slate-900/50"
         >
           <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-rose-600 group-hover:text-white transition-colors duration-300">
             <Calendar className="w-7 h-7" />
           </div>
-          <h3 className="text-xl font-bold text-slate-800 mb-2">Add Assignment</h3>
-          <p className="text-slate-500 text-sm leading-relaxed mb-6">Post a new task or homework for your students with a specific deadline.</p>
+          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Add Assignment</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">Post a new task or homework for your students with a specific deadline.</p>
           <div className="flex items-center justify-between text-rose-600 font-bold text-sm">
              <span>Post Task</span>
              <Plus className="w-4 h-4" />
@@ -402,16 +402,16 @@ export default function Dashboard() {
         </div>
 
         <div 
-          className="glass-panel p-8 rounded-3xl border border-slate-100 shadow-sm opacity-60 bg-slate-50 flex flex-col justify-center items-center text-center italic"
+          className="glass-panel p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm opacity-60 bg-slate-50 dark:bg-slate-900/50 flex flex-col justify-center items-center text-center italic"
         >
           <Book className="w-10 h-10 text-slate-300 mb-3" />
           <p className="text-slate-400 text-sm">More tools coming soon...</p>
         </div>
       </div>
 
-      <div className="p-6 bg-indigo-50 border border-indigo-100 rounded-3xl flex gap-4 items-start">
+      <div className="p-6 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl flex gap-4 items-start">
         <AlertCircle className="w-6 h-6 text-indigo-500 shrink-0" />
-        <div className="text-sm text-indigo-900 leading-relaxed">
+        <div className="text-sm text-indigo-900 dark:text-indigo-300 leading-relaxed">
           <p className="font-bold mb-1">Teacher Tip:</p>
           Lessons you upload will be visible on the module page instantly. You can choose which semester they belong to during upload.
         </div>
@@ -419,8 +419,8 @@ export default function Dashboard() {
 
       {/* MODALS */}
       {activeModal !== 'none' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg p-10 relative animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full max-w-lg p-10 relative animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-800">
             <button 
               onClick={closeModal}
               className="absolute top-6 right-6 p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors"
@@ -431,10 +431,10 @@ export default function Dashboard() {
             {activeModal === 'lesson' && (
               <>
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl"><Upload className="w-6 h-6" /></div>
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl"><Upload className="w-6 h-6" /></div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900">Upload Course</h2>
-                    <p className="text-sm text-slate-500">Pick a module and upload your PDF</p>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Upload Course</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Pick a module and upload your PDF</p>
                   </div>
                 </div>
 
@@ -443,11 +443,11 @@ export default function Dashboard() {
                 ) : (
                   <form onSubmit={handleAddLesson} className="space-y-6">
                     {lessonError && (
-                      <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl text-sm font-medium border border-rose-100">{lessonError}</div>
+                      <div className="p-4 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-2xl text-sm font-medium border border-rose-100 dark:border-rose-900/30">{lessonError}</div>
                     )}
                     
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">Module</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Module</label>
                        <SelectInput 
                          value={lessonForm.course_id} 
                          courses={courses}
@@ -456,7 +456,7 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">Semester</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Semester</label>
                        <SemesterToggle 
                          value={lessonForm.semester} 
                          onChange={(v) => setLessonForm({...lessonForm, semester: v})}
@@ -464,33 +464,33 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">Course Title</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Course Title</label>
                        <input 
                          type="text" required
                          placeholder="e.g. Introduction to Phonetics"
-                         className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all font-medium"
+                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 outline-none transition-all font-medium text-slate-700 dark:text-slate-200"
                          value={lessonForm.title}
                          onChange={(e) => setLessonForm({...lessonForm, title: e.target.value})}
                        />
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">PDF File</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">PDF File</label>
                        <div 
                          onClick={() => fileInputRef.current?.click()}
-                         className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center cursor-pointer hover:border-indigo-400 hover:bg-slate-50 transition-all group"
+                         className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center cursor-pointer hover:border-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group"
                        >
                          {lessonForm.file ? (
                            <div className="flex flex-col items-center gap-2">
                               <FileText className="w-10 h-10 text-indigo-500" />
-                              <span className="text-sm font-bold text-slate-700 truncate w-full px-4">{lessonForm.file.name}</span>
+                              <span className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate w-full px-4">{lessonForm.file.name}</span>
                               <span className="text-[10px] text-slate-400 uppercase tracking-widest">Click to change</span>
                            </div>
                          ) : (
                            <div className="flex flex-col items-center">
-                              <Upload className="w-10 h-10 text-slate-200 mb-3 group-hover:text-indigo-300 transition-colors" />
-                              <p className="text-sm font-bold text-slate-400">Click to Select PDF</p>
-                              <p className="text-xs text-slate-300 mt-1">Maximum size: 10MB</p>
+                              <Upload className="w-10 h-10 text-slate-200 dark:text-slate-800 mb-3 group-hover:text-indigo-300 transition-colors" />
+                              <p className="text-sm font-bold text-slate-400 dark:text-slate-500">Click to Select PDF</p>
+                              <p className="text-xs text-slate-300 dark:text-slate-700 mt-1">Maximum size: 10MB</p>
                            </div>
                          )}
                          <input 
@@ -502,7 +502,7 @@ export default function Dashboard() {
 
                     <div className="flex gap-4 pt-4">
                       <button type="button" onClick={closeModal} disabled={lessonLoading}
-                        className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition-colors">
+                        className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                         Cancel
                       </button>
                       <button type="submit" disabled={lessonLoading || !lessonForm.file}
@@ -518,10 +518,10 @@ export default function Dashboard() {
             {activeModal === 'assignment' && (
               <>
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl"><Calendar className="w-6 h-6" /></div>
+                  <div className="p-4 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-2xl"><Calendar className="w-6 h-6" /></div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900">Add Assignment</h2>
-                    <p className="text-sm text-slate-500">Create a task for your students</p>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Add Assignment</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Create a task for your students</p>
                   </div>
                 </div>
 
@@ -530,11 +530,11 @@ export default function Dashboard() {
                 ) : (
                   <form onSubmit={handleAddAssignment} className="space-y-6">
                     {asgError && (
-                      <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl text-sm font-medium border border-rose-100">{asgError}</div>
+                      <div className="p-4 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-2xl text-sm font-medium border border-rose-100 dark:border-rose-900/30">{asgError}</div>
                     )}
                     
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">Module</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Module</label>
                        <SelectInput 
                          value={asgForm.course_id} 
                          courses={courses}
@@ -543,7 +543,7 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">Semester</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Semester</label>
                        <SemesterToggle 
                          value={asgForm.semester} 
                          onChange={(v) => setAsgForm({...asgForm, semester: v})}
@@ -551,21 +551,21 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">Assignment Title</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Assignment Title</label>
                        <input 
                          type="text" required
                          placeholder="e.g. Essay on Academic Writing"
-                         className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all font-medium"
+                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 dark:focus:ring-rose-900/20 outline-none transition-all font-medium text-slate-700 dark:text-slate-200"
                          value={asgForm.title}
                          onChange={(e) => setAsgForm({...asgForm, title: e.target.value})}
                        />
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-sm font-bold text-slate-700 ml-1">Deadline</label>
+                       <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Deadline</label>
                        <input 
                          type="datetime-local"
-                         className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all font-medium"
+                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 dark:focus:ring-rose-900/20 outline-none transition-all font-medium text-slate-700 dark:text-slate-200"
                          value={asgForm.deadline}
                          onChange={(e) => setAsgForm({...asgForm, deadline: e.target.value})}
                        />
@@ -573,7 +573,7 @@ export default function Dashboard() {
 
                     <div className="flex gap-4 pt-4">
                       <button type="button" onClick={closeModal} disabled={asgLoading}
-                        className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition-colors">
+                        className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                         Cancel
                       </button>
                       <button type="submit" disabled={asgLoading}

@@ -78,19 +78,19 @@ export default function Courses() {
 
       {/* ─── Static module cards ────────────────────────────────────────── */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-1">Our Modules</h2>
-        <p className="text-slate-500 mb-8 text-sm">
-          Click <span className="font-semibold text-slate-700">Get Courses</span> to open the module page with semester 1 & 2 materials
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-1">Our Modules</h2>
+        <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm">
+          Click <span className="font-semibold text-slate-700 dark:text-slate-300">Get Courses</span> to open the module page with semester 1 & 2 materials
         </p>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {MODULE_CARDS.map((mod) => (
             <div
               key={mod.slug}
-              className="group bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col"
+              className="group bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col"
             >
               {/* Image */}
-              <div className="relative h-44 overflow-hidden bg-slate-200">
+              <div className="relative h-44 overflow-hidden bg-slate-200 dark:bg-slate-800">
                 <img
                   src={mod.image}
                   alt={mod.name}
@@ -99,7 +99,7 @@ export default function Courses() {
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t ${mod.gradient} opacity-50`} />
                 <div className="absolute bottom-3 left-3">
-                  <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full border bg-white/90 ${mod.badge}`}>
+                  <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full border bg-white/90 dark:bg-slate-900/90 ${mod.badge}`}>
                     {mod.name.split(' ')[0]}
                   </span>
                 </div>
@@ -107,8 +107,8 @@ export default function Courses() {
 
               {/* Body */}
               <div className="p-5 flex flex-col flex-1">
-                <h3 className="text-base font-bold text-slate-800 mb-2 leading-snug">{mod.name}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed flex-1 line-clamp-3">{mod.description}</p>
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-2 leading-snug">{mod.name}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed flex-1 line-clamp-3">{mod.description}</p>
 
                 {/* Get Courses button → navigates to module page */}
                 <button

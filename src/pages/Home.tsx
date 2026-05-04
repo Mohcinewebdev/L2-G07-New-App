@@ -1,46 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Calendar, FileText, ArrowRight, Clock, BookOpen, Loader2 } from 'lucide-react';
+import { Calendar, ArrowRight, Clock, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-
-interface RecentAssignment {
-  id: string;
-  title: string;
-  module: string;
-  deadline: string;
-  created_at: string;
-}
-
-const MODULE_MAP: Record<string, string> = {
-  'Phonetics & Linguistics': 'phonetics',
-  'Reading & Text Analysis': 'reading',
-  'Written Expression': 'written-exp',
-  'Grammar': 'grammar',
-  'Study Skills': 'study-skills',
-  'Literature': 'literature',
-  'Civilization': 'civilization',
-};
 
 export default function Home() {
-  const [assignments, setAssignments] = useState<RecentAssignment[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchRecentAssignments() {
-      const { data, error } = await supabase
-        .from('assignments')
-        .select('id, title, module, deadline, created_at')
-        .order('created_at', { ascending: false })
-        .limit(3);
-
-      if (!error && data) {
-        setAssignments(data);
-      }
-      setLoading(false);
-    }
-    fetchRecentAssignments();
-  }, []);
-
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Hero Section */}
@@ -57,7 +18,7 @@ export default function Home() {
             Official Student Portal
           </div>
           <h1 className="text-5xl sm:text-6xl font-black tracking-tight mb-6 leading-tight">
-            Welcome to <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">L2 | G07</span>
+            Welcome to <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">L2 | G07</span>
           </h1>
           <p className="text-xl text-white/80 mb-10 max-w-xl font-medium leading-relaxed">
             Access your courses, materials, and track assignments in a unified digital space designed for Group 07.
@@ -72,92 +33,47 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="grid lg:grid-cols-2 gap-8 mt-8">
-        {/* Recent Assignments Section */}
-        <section className="card-hover glass-panel rounded-[2rem] p-8 sm:p-10 relative overflow-hidden bg-white/40 border border-slate-100">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl shadow-inner">
-                <FileText className="w-7 h-7" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Recent Assignments</h2>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Latest updates</p>
-              </div>
-            </div>
-            <Link to="/courses" className="text-primary hover:underline text-sm font-bold flex items-center gap-1 group">
-              View all <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-          
-          {loading ? (
-            <div className="space-y-4">
-               {[...Array(3)].map((_, i) => (
-                 <div key={i} className="h-24 rounded-2xl bg-slate-100/50 animate-pulse border border-slate-100" />
-               ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {/* Combine real assignments and placeholders to always show 3 slots */}
-              {[...assignments, ...Array(Math.max(0, 3 - assignments.length)).fill(null)].slice(0, 3).map((asg, i) => {
-                const cardContent = (
-                  <div key={asg?.id || `placeholder-${i}`} className={`p-5 rounded-2xl border border-slate-100 bg-white transition-all relative overflow-hidden ${asg ? 'hover:border-indigo-200 hover:shadow-lg cursor-pointer group' : 'opacity-50'}`}>
-                    <div className={`absolute top-0 left-0 w-1 h-full ${asg ? 'bg-indigo-500 group-hover:w-2' : 'bg-slate-200'} transition-all`} />
-                    <div className="flex justify-between items-start gap-4">
-                        <div>
-                          <h4 className={`font-bold text-lg mb-1 ${asg ? 'text-slate-800 group-hover:text-indigo-600' : 'text-slate-400'}`}>
-                            {asg ? asg.title : 'Recently added module'}
-                          </h4>
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-tighter">
-                            <BookOpen className={`w-3.5 h-3.5 ${asg ? 'text-indigo-400' : 'text-slate-200'}`} />
-                            {asg ? asg.module : 'Stay tuned for updates'}
-                          </div>
-                        </div>
-                        {asg && asg.deadline && (
-                          <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 text-slate-500 text-[10px] font-black border border-slate-100 uppercase tracking-tighter">
-                            <Clock className="w-3 h-3" />
-                            Due: {new Date(asg.deadline).toLocaleDateString()}
-                          </div>
-                        )}
-                        {!asg && (
-                          <div className="shrink-0 text-[10px] font-bold text-slate-300 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-lg">
-                            Coming soon
-                          </div>
-                        )}
-                    </div>
-                  </div>
-                );
-
-                if (asg && MODULE_MAP[asg.module]) {
-                  return (
-                    <Link key={asg.id} to={`/module/${MODULE_MAP[asg.module]}`} className="block">
-                      {cardContent}
-                    </Link>
-                  );
-                }
-
-                return cardContent;
-              })}
-            </div>
-          )}
-        </section>
-
+      <div className="max-w-4xl mx-auto mt-12">
         {/* Exams & Upcoming */}
-        <section className="card-hover glass-panel rounded-[2rem] p-8 sm:p-10 relative overflow-hidden border border-slate-100 bg-white/40">
+        <section className="card-hover glass-panel rounded-[2rem] p-8 sm:p-10 relative overflow-hidden border border-slate-100 dark:border-slate-800 bg-white/40 dark:bg-slate-900/40">
           <div className="flex items-center gap-4 mb-8">
             <div className="p-4 bg-rose-50 text-rose-500 rounded-2xl shadow-inner">
               <Calendar className="w-7 h-7" />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Upcoming Exams</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Deadlines & Tests</p>
+              <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Upcoming Exams</h2>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Semester 04</p>
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center p-12 text-center bg-slate-50/50 rounded-3xl border border-2 border-dashed border-slate-100">
-             <Calendar className="w-12 h-12 text-slate-200 mb-3" />
-             <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">No exams scheduled</p>
-             <p className="text-[10px] text-slate-400 mt-1">Check back later for mid-term schedule.</p>
+          <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 relative custom-scrollbar">
+            {[
+              { module: 'Phonetics & Linguistics', date: 'Sunday, 10 May 2026', time: '2:00 PM', colorClass: 'bg-indigo-50 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-400' },
+              { module: 'Literature', date: 'Monday, 11 May 2026', time: '2:00 PM', colorClass: 'bg-rose-50 text-rose-500 dark:bg-rose-500/20 dark:text-rose-400' },
+              { module: 'Written Expression', date: 'Tuesday, 12 May 2026', time: '2:00 PM', colorClass: 'bg-emerald-50 text-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400' },
+              { module: 'Civilization', date: 'Wednesday, 13 May 2026', time: '2:00 PM', colorClass: 'bg-amber-50 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400' },
+              { module: 'Study Skills', date: 'Thursday, 14 May 2026', time: '2:00 PM', colorClass: 'bg-cyan-50 text-cyan-500 dark:bg-cyan-500/20 dark:text-cyan-400' },
+              { module: 'Grammar', date: 'Sunday, 17 May 2026', time: '2:00 PM', colorClass: 'bg-violet-50 text-violet-500 dark:bg-violet-500/20 dark:text-violet-400' },
+            ].map((exam, i) => (
+              <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-100 dark:hover:border-indigo-500/30 hover:shadow-md transition-all group">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl shrink-0 ${exam.colorClass} group-hover:scale-110 transition-transform`}>
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{exam.module}</h4>
+                    <p className="text-[11px] text-slate-700 dark:text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1 mt-1">
+                      <Calendar className="w-3.5 h-3.5" /> {exam.date}
+                    </p>
+                  </div>
+                </div>
+                <div className="sm:text-right flex items-center sm:justify-end ml-[3.25rem] sm:ml-0">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 text-xs font-black border border-slate-100 dark:border-slate-700 uppercase tracking-tighter group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:border-indigo-100 dark:group-hover:border-indigo-500/30 transition-colors">
+                    <Clock className="w-3.5 h-3.5" /> {exam.time}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </div>

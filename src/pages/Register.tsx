@@ -91,17 +91,17 @@ export default function Register() {
     return (
       <div className="flex items-center justify-center min-h-[75vh] py-10">
         <div className="w-full max-w-lg">
-          <div className="glass-panel p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col items-center bg-white text-center">
-            <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-6">
+          <div className="glass-panel p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col items-center bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-center">
+            <div className="w-20 h-20 rounded-full bg-green-50 dark:bg-green-950/30 flex items-center justify-center mb-6">
               <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-3">Check your email!</h2>
-            <p className="text-slate-500 mb-4 leading-relaxed">
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">Check your email!</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
               We sent a confirmation link to{' '}
-              <span className="font-semibold text-slate-700">{email}</span>.
+              <span className="font-semibold text-slate-700 dark:text-slate-300">{email}</span>.
               Click it to activate your account — you will be taken directly to your dashboard.
             </p>
-            <div className="flex items-center gap-2 px-4 py-3 bg-blue-50 rounded-xl text-blue-700 text-sm font-medium mb-6 w-full">
+            <div className="flex items-center gap-2 px-4 py-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl text-blue-700 dark:text-blue-400 text-sm font-medium mb-6 w-full">
               <Mail className="w-5 h-5 flex-shrink-0" />
               <span>The link will redirect to the live site, not localhost.</span>
             </div>
@@ -120,34 +120,34 @@ export default function Register() {
   return (
     <div className="flex items-center justify-center min-h-[75vh] py-10">
       <div className="w-full max-w-lg">
-        <div className="glass-panel p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col bg-white">
+        <div className="glass-panel p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-2xl shadow-inner">
               L2
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-center text-slate-800 mb-2">Create an Account</h2>
-          <p className="text-center text-slate-500 mb-8 font-medium">Join the L2 G07 platform</p>
+          <h2 className="text-3xl font-bold text-center text-slate-800 dark:text-slate-100 mb-2">Create an Account</h2>
+          <p className="text-center text-slate-500 dark:text-slate-400 mb-8 font-medium">Join the L2 G07 platform</p>
 
           <form onSubmit={handleRegister} className="space-y-6">
             {error && (
-              <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
+              <div className="p-4 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium border border-red-100 dark:border-red-900/30">
                 {error}
               </div>
             )}
 
             {/* Role selector */}
             <div className="space-y-3">
-              <label className="text-sm font-semibold text-slate-700 block">I am a...</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block">I am a...</label>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setRole('student')}
                   className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-medium ${
                     role === 'student'
-                      ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-slate-100 bg-white text-slate-500 hover:border-primary/30 hover:bg-slate-50'
+                      ? 'border-primary bg-primary/5 text-primary dark:bg-primary/10'
+                      : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:border-primary/30 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
                   <GraduationCap className="w-6 h-6" />
@@ -158,8 +158,8 @@ export default function Register() {
                   onClick={() => setRole('teacher')}
                   className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-medium ${
                     role === 'teacher'
-                      ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                      : 'border-slate-100 bg-white text-slate-500 hover:border-indigo-200 hover:bg-slate-50'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400'
+                      : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
                   <BookOpen className="w-6 h-6" />
@@ -171,7 +171,7 @@ export default function Register() {
             {/* NEW: Module selector — visible only for teachers */}
             {role === 'teacher' && (
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 block" htmlFor="module">
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block" htmlFor="module">
                   Module you teach
                 </label>
                 <div className="relative">
@@ -180,7 +180,7 @@ export default function Register() {
                     required={role === 'teacher'}
                     value={selectedModule}
                     onChange={(e) => setSelectedModule(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium text-slate-700 bg-white appearance-none cursor-pointer pr-10"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 outline-none transition-all font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-950 appearance-none cursor-pointer pr-10"
                   >
                     <option value="">— Select a module —</option>
                     {MODULES.map((mod) => (
@@ -200,14 +200,14 @@ export default function Register() {
 
             {/* Full name */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 block" htmlFor="name">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block" htmlFor="name">
                 Full Name
               </label>
               <input
                 id="name"
                 type="text"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 font-medium"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium text-slate-700 dark:text-slate-200"
                 placeholder="Your Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -216,14 +216,14 @@ export default function Register() {
 
             {/* Email */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 block" htmlFor="email">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block" htmlFor="email">
                 Email Address
               </label>
               <input
                 id="email"
                 type="email"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 font-medium"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium text-slate-700 dark:text-slate-200"
                 placeholder="you@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -232,7 +232,7 @@ export default function Register() {
 
             {/* Password */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 block" htmlFor="password">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block" htmlFor="password">
                 Password
               </label>
               <input
@@ -240,7 +240,7 @@ export default function Register() {
                 type="password"
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 font-medium"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium text-slate-700 dark:text-slate-200"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -267,7 +267,7 @@ export default function Register() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm font-medium text-slate-500">
+          <p className="mt-8 text-center text-sm font-medium text-slate-500 dark:text-slate-400">
             Already have an account?{' '}
             <Link to="/login" className="text-primary hover:text-primary-dark font-bold hover:underline">
               Sign in here

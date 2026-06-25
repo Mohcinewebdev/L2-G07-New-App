@@ -224,7 +224,7 @@ export default function Layout() {
       <footer className="glass-panel border-t border-gray-200 dark:border-slate-800 mt-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
         <div className="container mx-auto px-4 py-6">
           <p className="text-center text-sm text-slate-500 dark:text-slate-400 font-medium">
-            &copy; {new Date().getFullYear()} Developed And Designed By MOHCENE ZIADI | L2 | G07 English Department. All rights reserved.
+            &copy; {new Date().getFullYear()} Developed And Designed By MOHCENE ZIADI | L2 | G07 English Department. 2025-2026 All rights reserved. 
           </p>
         </div>
       </footer>

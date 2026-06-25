@@ -21,8 +21,10 @@ export default function Home() {
             Welcome to <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">L2 | G07</span>
           </h1>
           <p className="text-xl text-white/80 mb-10 max-w-xl font-medium leading-relaxed">
-            Access your courses, materials, and track assignments in a unified digital space designed for Group 07.
-            Developed and Designed By MOHCENE ZIADI
+            Access your courses, materials, and track assignments in a unified digital space designed for L2 Group 07.
+            By MOHCENE ZIADI
+            <br/>
+            Academic Year: 2025-2026
           </p>
           <div className="flex flex-wrap gap-4">
             <Link to="/courses" className="inline-flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all">

@@ -64,7 +64,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
               <div className="mt-8 flex items-center justify-center gap-2 text-xs text-slate-400 font-medium">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>English Department — University Platform</span>
+                <span>English Department — University UB2</span>
               </div>
             </div>
           </div>
